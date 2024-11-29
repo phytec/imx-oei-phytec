@@ -64,7 +64,7 @@ ifdef board
     SOM := $(board)
 endif
 # Default to mx95lp5
-SOM ?= mx95lp5
+SOM ?= mx95libra
 
 # Configure SOC revision
 ifdef r
@@ -132,7 +132,7 @@ $(OUT)/%.o : %.S
 
 $(OUT)/$(IMG) : $(OBJS)
 	@echo "Linking $@ ...."
-	$(AT)$(LD) -o $@ $(OBJS) $(LFLAGS) 
+	$(AT)$(LD) -o $@ $(OBJS) $(LFLAGS)
 
 $(OUT)/$(IMG).elf : $(OBJS)
 	@echo "Linking $@ ...."
