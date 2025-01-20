@@ -63,8 +63,8 @@ endif
 ifdef board
     SOM := $(board)
 endif
-# Default to mx95lp5
-SOM ?= mx95lp5
+# Default to mx95libra
+SOM ?= mx95libra
 
 # Configure SOC revision
 ifdef r
@@ -158,7 +158,7 @@ help :
 	@/bin/echo -e "\tclean          : remove all build files"
 	@/bin/echo -e "\treally-clean   : remove build directory\n"
 	@/bin/echo -e "\nOptions:"
-	@/bin/echo -e "\tboard=mx95lp5/mx95lp4x/mx95lp4x-15  : the board,            default: mx95lp5"
+	@/bin/echo -e "\tboard=mx95lp5/mx95lp4x/mx95lp4x-15/mx95libra  : the board,            default: mx95libra"
 	@/bin/echo -e "\toei=ddr/tcm                         : OEI type,             default: ddr"
 	@/bin/echo -e "\tr=A0/B0                             : SOC revision,         default: A0"
 	@/bin/echo -e "\tDEBUG=1 or d=1                      : enable debug output,  default: off"
