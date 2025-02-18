@@ -1,4 +1,4 @@
-The Optional Executable Image (OEI) is an optional plugin loaded and executed by Cortex-M processor 
+The Optional Executable Image (OEI) is an optional plugin loaded and executed by Cortex-M processor
 ROM on many NXP i.MX processors. The Cortex-M is the boot core, runs the boot ROM which loads the OEI, and then
 branches to the OEI. The OEI then configures some aspects of the hardware such as DDR config, init TCM ECC, etc.
 There could be multiple OEI images in the boot container. After execution of OEI, the processor returns
@@ -24,26 +24,17 @@ Installing the Toolchain
 Compiling requires an ARM cross-compiler. Download and install the required arm-none-eabi toolchain from
 the [Arm GNU Toolchain Downloads](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 website. For example, from the x86_64 Linux hosted cross toolchains AArch32 bare-metal target
-(arm-none-eabi) section, download the *.xz file to a directory for the tool chain (e.g. tools) and then:
+(arm-none-eabi) section, download the *.xz file to a directory for the tool chain and then:
 
     tar xvf *.xz
 
-Set the TOOLS shell variable to the directory the toolchain is installed in. For example:
-
-    export TOOLS=~/tools
-
-The expected toolchain location is defined in oei/makefiles/gcc_cross.mak:
-
-    OEI_CROSS_COMPILE ?= $(TOOLS)/arm-gnu-toolchain-$(TC_VERSION)-x86_64-arm-none-eabi/bin/arm-none-eabi-
-
-The default toolchain version is defined in oei/makefiles/common.mak:
+The expected toolchain version is defined in oei/makefiles/common.mak:
 
     export TC_VERSION ?= 15.2.rel1
 
-If you have a different version installed, please specify it either by redefining TC_VERSION in
-common.mk, or by setting TC_VERSION in build command:
+Set the CROSS_COMPILE environment variable. For example:
 
-    make TC_VERSION=<installed version> ...
+    export CROSS_COMPILE="ccache /path/to/arm-gnu-toolchain-$(TC_VERSION)-x86_64-arm-none-eabi/bin/arm-none-eabi-"
 
 Also ensure the Linux installation is up-to-date and then install:
 
