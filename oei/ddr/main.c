@@ -71,10 +71,8 @@ int oei_main(uint32_t argc, uint32_t *argv)
         timer_enable();
 
     Clock_Init();
-#ifdef DEBUG
     BOARD_InitPins();
     BOARD_InitDebugConsole();
-#endif
 
 #ifdef DDR_IEE
     prepare_iee();
