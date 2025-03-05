@@ -22,10 +22,8 @@ INCLUDE +=  \
 OBJS += \
 	$(OUT)/board.o
 
-ifeq ($(DEBUG),1)
 OBJS += \
 	$(OUT)/pin_mux.o
-endif
 
 VPATH +=  \
 	$(BOARDS_DIR)  \

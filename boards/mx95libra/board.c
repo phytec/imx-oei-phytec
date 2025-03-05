@@ -11,7 +11,6 @@
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
 
-#if defined(DEBUG)
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -80,7 +79,6 @@ void BOARD_InitDebugConsole(void)
             (uint32_t) rate & 0xFFFFFFFFU);
     }
 }
-#endif
 
 /*--------------------------------------------------------------------------*/
 /* Initialize board                                                         */
@@ -88,8 +86,6 @@ void BOARD_InitDebugConsole(void)
 void BOARD_InitHardware(void)
 {
     Clock_Init();
-#if defined(DEBUG)
     BOARD_InitPins();
     BOARD_InitDebugConsole();
-#endif
 }
