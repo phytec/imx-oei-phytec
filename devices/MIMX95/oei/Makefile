@@ -50,12 +50,10 @@ SDK_OBJS = \
     $(OUT)/fsl_src.o  \
     $(OUT)/fsl_sysctr.o
 
-ifeq ($(DEBUG),1)
 OBJS  +=  \
     $(OUT)/soc_printf.o
 SDK_OBJS += \
     $(OUT)/fsl_lpuart.o
-endif
 
 OBJS  +=  \
     $(OUT)/soc_clock.o  \
