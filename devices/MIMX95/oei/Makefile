@@ -59,15 +59,18 @@ OBJS  +=  \
 
 ifeq ($(OEI),ddr)
 INCLUDE += \
+	-I$(DRIVER_DIR)/lpi2c  \
 	-I$(DRIVER_DIR)/mu1 \
 	-I$(DRIVER_DIR)/ele
 
 VPATH += \
+    $(DRIVER_DIR)/lpi2c  \
     $(DRIVER_DIR)/mu1 \
     $(DRIVER_DIR)/ele
 
 OBJS  += \
     $(OUT)/soc_ddr.o \
+    $(OUT)/fsl_lpi2c.o  \
     $(OUT)/fsl_mu.o \
     $(OUT)/fsl_ele.o \
     $(OUT)/crc.o
