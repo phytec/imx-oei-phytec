@@ -63,6 +63,9 @@ const board_uart_config_t *BOARD_GetDebugUart(void);
 /*! Init the debug UART */
 void BOARD_InitDebugConsole(void);
 
+/*! Init serial buses */
+void BOARD_InitSerialBus(void);
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
