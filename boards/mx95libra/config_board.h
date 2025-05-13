@@ -61,6 +61,9 @@
 /*! Config for EEPROM I2C baudrate */
 #define BOARD_I2C_BAUDRATE           400000U
 
+/*! Patch the RAM timings */
+#define DDR_EEPROM_TOOL
+
 #endif /* CONFIG_BOARD_H */
 
 /** @} */

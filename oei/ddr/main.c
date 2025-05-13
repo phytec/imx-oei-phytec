@@ -13,6 +13,7 @@
 #include "time.h"
 #include "build_info.h"
 
+#include "fsl_lpi2c.h"
 #include "fsl_sysctr.h"
 
 #ifdef  DDR_MEM_TEST
@@ -116,6 +117,31 @@ int oei_main(uint32_t argc, uint32_t *argv)
         return OEI_FAIL;
     }
 
+#ifdef DDR_EEPROM_TOOL
+    BOARD_InitSerialBus();
+    printf("BOARD_InitSerialBus \n");
+
+    LPI2C_Type *base = LPI2C1;  /*FIXME from BOARD_I2C_INSTANCE*/
+    uint8_t rxBuff[17] = {0};
+    rxBuff[16] = '\0';
+    status_t status;
+
+    lpi2c_master_transfer_t xfer;
+
+    xfer.flags          = 0;
+    xfer.slaveAddress   = 0x51;
+    xfer.direction      = kLPI2C_Read;
+    xfer.subaddress     = 0;
+    xfer.subaddressSize = 2;
+    xfer.data           = rxBuff;
+    xfer.dataSize       = 16;
+
+    printf("\nLPI2C_MasterTransferBlocking call");
+    status = LPI2C_MasterTransferBlocking(base, &xfer);
+    printf("\nstatus %u\n", status);
+    printf("\nEEPROM: %s\n", rxBuff);
+
+#endif
     ret = Ddrc_Init(&dram_timing, id);
 
 #ifdef  DDR_MEM_TEST
