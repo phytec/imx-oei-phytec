@@ -77,7 +77,7 @@ uint8_t CRC_J1850(const uint8_t *addr, uint32_t size)
 {
     const uint8_t *a = addr;
     uint32_t sz = size;
-    uint32_t crc = 0xFFUL;
+    uint32_t crc = 0xFFU;
 
     /* Loop over data */
     while (sz > 0U)

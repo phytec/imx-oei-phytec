@@ -4,6 +4,7 @@
  */
 
 #include <stdint.h>
+#include "fsl_device_registers.h"
 
 typedef volatile uint32_t __IOU32;
 typedef volatile uint16_t __IOU16;
@@ -45,12 +46,8 @@ typedef volatile uint16_t __IOU16;
 #define OCRAM_START_ADDR 0x20480000
 #define OCRAM_SOURCE_DATA_SIZE (128 * 1024) /* edma copy ocram's data(data is 0) to tcm */
 
-#define SRC_M7MIX_SLICE_SW_CTRL (0x44464820UL)
-#define SRC_M7MIX_SLICE_FUNC_STAT (0x444648b4UL)
-#define SRC_M7MIX_SLICE_MEM_CTRL (0x44464904UL)
-#define SRC_M7MIX_SLICE_MEM_STAT (0x44464918UL)
-#define SW_CTRL_PDN_SOFT_MASK BIT(31)
-#define MEM_CTRL_LP_MODE_MASK BIT(1)
+#define SRC_XSPR_M7MIX_MEM        CCMSRCGPC__SRC__XSPR_M7MIX_MEM
+
 /* WAKEUP.EDMA5 - Register Layout Typedef */
 
 typedef struct {

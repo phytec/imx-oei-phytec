@@ -91,8 +91,12 @@ uint32_t Get_Training_Data_Offset(uint32_t *offset)
     return ret;
 }
 
+void Ddr_Post_Init(void)
+{
+}
+
 #if defined(CONFIG_ELE)
-bool Ddr_Training_Data_Sign(void)
+bool Ddr_Training_Data_Sign(uint32_t img_id)
 {
     ddrphy_qb_state *qb_state;
     uint32_t size;
@@ -103,28 +107,50 @@ bool Ddr_Training_Data_Sign(void)
 
     ret = ELE_SignData(&qb_state->TrainedVREFCA_A0, size, &qb_state->mac, 0U);
 
+    if (ret == ELE_SUCCESS_IND)
+    {
+        /**
+         * Release in read-write mode the memory used to load
+         * training data if signing training data succeeds
+         */
+        ELE_ReleaseImageRam(img_id, 0U);
+    }
+
     return (ret == ELE_SUCCESS_IND);
 }
 
-bool Ddr_Training_Data_Check(void)
+bool Ddr_Training_Data_Check(uint32_t img_id)
 {
     ddrphy_qb_state *qb_state;
-    uint32_t size;
+    uint32_t i, sum, size;
     int ret;
 
     qb_state = (ddrphy_qb_state *)(QB_STATE_LOAD_ADDR);
     size = sizeof(ddrphy_qb_state) - MAC_LENGTH * sizeof(uint32_t);
 
+    /**
+     * Check if signature is empty
+     */
+    for (sum = 0, i = 0; i < MAC_LENGTH; i++)
+    {
+        sum |= qb_state->mac[i];
+    }
+
+    /**
+     * For empty signature there is no need to send ELE request to check it
+     */
+    if (sum == 0)
+    {
+        return false;
+    }
+
     ret = ELE_VerifyData(&qb_state->TrainedVREFCA_A0, size, &qb_state->mac, 0U);
 
-    return (ret == ELE_SUCCESS_IND);
-}
-
-bool Ddr_Training_Data_Release(uint32_t img_id)
-{
-    int ret;
-
-    ret = ELE_ReleaseImageRam(img_id, 0U);
+    /**
+     * Release in read-write mode the memory used to load training
+     * data regardless of training data is valid or not
+     */
+    ELE_ReleaseImageRam(img_id, 0U);
 
     return (ret == ELE_SUCCESS_IND);
 }
@@ -137,34 +163,29 @@ void Ddr_Training_Data_Invalidate(void)
     qb_state->mac[0U] = 0U;
 }
 #else
-bool Ddr_Training_Data_Sign(void)
+bool Ddr_Training_Data_Sign(uint32_t img_id)
 {
        ddrphy_qb_state *qb_state;
        uint32_t size;
 
        qb_state = (ddrphy_qb_state *)(QB_STATE_SAVE_ADDR);
-       size = sizeof(ddrphy_qb_state) - sizeof(uint32_t);
-       qb_state->crc = CRC_Crc32(&qb_state->TrainedVREFCA_A0, size);
+       size = sizeof(ddrphy_qb_state) - MAC_LENGTH * sizeof(uint32_t);
+       qb_state->mac[0] = CRC_Crc32(&qb_state->TrainedVREFCA_A0, size);
 
        return true;
 }
 
-bool Ddr_Training_Data_Check(void)
+bool Ddr_Training_Data_Check(uint32_t img_id)
 {
     ddrphy_qb_state *qb_state;
     uint32_t size, crc;
 
     qb_state = (ddrphy_qb_state *)(QB_STATE_LOAD_ADDR);
 
-    size = sizeof(ddrphy_qb_state) - sizeof(uint32_t);
+    size = sizeof(ddrphy_qb_state) - MAC_LENGTH * sizeof(uint32_t);
     crc = CRC_Crc32(&qb_state->TrainedVREFCA_A0, size);
 
-    return (crc == qb_state->crc);
-}
-
-bool Ddr_Training_Data_Release(uint32_t img_id)
-{
-    return true;
+    return (crc == qb_state->mac[0]);
 }
 
 void Ddr_Training_Data_Invalidate(void)
@@ -172,6 +193,6 @@ void Ddr_Training_Data_Invalidate(void)
     ddrphy_qb_state *qb_state;
 
     qb_state = (ddrphy_qb_state *)(QB_STATE_SAVE_ADDR);
-    qb_state->crc = 0U;
+    qb_state->mac[0] = 0U;
 }
 #endif

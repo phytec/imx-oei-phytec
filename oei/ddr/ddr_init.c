@@ -8,6 +8,12 @@
 #include "oei.h"
 #include "soc_ddr.h"
 
+/* Local Functions */
+
+#if (!defined(DDR_NO_PHY))
+static uint32_t DDR_SimpleDivRound(uint32_t val, uint32_t denom);
+#endif
+
 /*--------------------------------------------------------------------------*/
 /* DDR Controller Idle status                                               */
 /*--------------------------------------------------------------------------*/
@@ -66,7 +72,10 @@ int Ddrc_Config(struct dram_timing_info *dtiming, uint32_t fsp_id)
      */
     for (i = 0; i < dtiming->fsp_msg_num; i++)
     {
-        if (dtiming->fsp_table[i] == dtiming->fsp_msg[fsp_id].drate) { break; }
+        if (dtiming->fsp_table[i] == dtiming->fsp_msg[fsp_id].drate)
+        {
+            break;
+        }
     }
 
     if (i < dtiming->fsp_cfg_num)
@@ -158,7 +167,6 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     uint32_t fsp_id, drate;
 #if (!defined(DDR_NO_PHY))
     uint32_t acg;
-    bool valid;
 #endif
 
     /* reset ddrphy */
@@ -173,15 +181,11 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     fsp_id = dtiming->fsp_msg_num - 1;
     drate = dtiming->fsp_msg[fsp_id].drate;
     /* default to the last frequency point clock */
-    Ddr_Phy_Init_Set_Dfi_Clk(drate);
+    Ddr_Phy_Init_Set_Dfi_Clk(drate, dtiming->fsp_msg[fsp_id].ssc);
 
 #if (!defined(DDR_NO_PHY))
     /** Verify training data loaded from non-volatile memory */
-    valid = Ddr_Training_Data_Check();
-    /** Release in read-write mode the memory used to load training data */
-    Ddr_Training_Data_Release(img_id);
-
-    if (valid)
+    if (Ddr_Training_Data_Check(img_id))
     {
         /* Configure PHY in QuickBoot mode */
         ret = Ddr_Cfg_Phy_Qb(dtiming, fsp_id);
@@ -189,6 +193,19 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     }
     else
     {
+        /* Move obtaining the Pathphase init values from SM to OEI after
+           training perform this before Ddr_Phy_Qb_Save()
+         */
+        /*! PathPhase select */
+        uint16_t pathsel[4];
+        uint32_t idx;
+        uint32_t sumpathphase = 0;
+        uint16_t count = 128;
+        uint16_t loop = count;
+        uint32_t dbytes;
+        uint16_t init = 0;
+        uint32_t addr = 0;
+
         /*
          * Start PHY initialization and training by
          * accessing relevant PUB registers
@@ -196,22 +213,80 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
         ret = Ddr_Cfg_Phy(dtiming);
         if (ret) { return ret; }
 
+        /* CSR bus: MCU/PIE/DMA++,TDR/APB-- */
+        Dwc_Ddrphy_Apb_Wr(0xd0000, 0x0);
+
+        /* Detect how many bytes are used in the DDR interface.
+           Cannot retrieve this information from the DDRC since
+           it has not been configured yet. Instead, we can get
+           this information from the DDR PHY CSR AcLnDisable. This tells
+           us which CA bus signals are disabled for each channel. For
+           channel B, this CSR address is 0x310ac. If any of the CA bus signals
+           are disabled (denoted by setting it to "1"), then this implies this
+           channel is disabled indicating we are in 16-bit (2 byte) mode.
+           This CSR definition changes depending on LP4 or LP5 mode, but in
+           either mode, bit[0] indicates CA0.
+           Hence, for simplicity, we can just read bit[0] which is ChB_CA0 and
+           if it returns "1", it means ChB is disabled.
+         */
+        if (((uint16_t)Dwc_Ddrphy_Apb_Rd(0x310acU) & 0x1U) == 0x1U)
+        {
+            dbytes = 2U;
+        }
+        else
+        {
+            dbytes = 4U;
+        }
+
+        /* Obtain the baseline RxReplica receive delay line values by
+           taking 128 samples and averaging it, per byte lane, then store
+           this in RxReplicaCtl03.
+         */
+        for (idx = 0U; idx < dbytes; idx++)
+        {
+            sumpathphase = 0U;
+            loop = count;
+
+            /* Get path select */
+            /* RxReplicaCtl01: Specify which of the five
+             * RxReplicaPathPhase[0..4]
+             * to use for computing RxReplicaRatioNow.
+             */
+            addr = 0x100adU + (idx << 12U);
+            pathsel[idx] = (uint16_t)(Dwc_Ddrphy_Apb_Rd(addr));
+
+            /* Obtain 128 samples of the receive delay line (pathphase) from
+               the RxReplica circuit
+             */
+            while (loop-- != 0U)
+            {
+                addr = 0x100d0U + (idx << 12U) + pathsel[idx];
+                sumpathphase += (uint16_t)Dwc_Ddrphy_Apb_Rd(addr);
+            }
+
+            /* Got Pathphase init values*/
+            init = (uint16_t)(DDR_SimpleDivRound(sumpathphase, count));
+            /* Store the receive dealy line (pathphase) baseline to
+               RxReplicaCtl03
+             */
+            addr = 0x100afU + (idx << 12U);
+            Dwc_Ddrphy_Apb_Wr(addr, init);
+        }
+
+        Dwc_Ddrphy_Apb_Wr(0xd0000U, 0x1U);
+
         /** Collect training data */
         Ddr_Phy_Qb_Save();
 
         /** Sign collected training data */
-        Ddr_Training_Data_Sign();
-
-        /**
-         * Release in read-write mode the memory used
-         * to save and sign training data
-         */
-        Ddr_Training_Data_Release(img_id);
+        Ddr_Training_Data_Sign(img_id);
     }
+#endif
 
     /* save the ddr info for retention */
     Ddr_Cfg_Save(dtiming);
 
+#if (!defined(DDR_NO_PHY))
     /* save the ddr PHY trained CSR for retention */
     Ddr_Phy_Trained_Csr_Save();
 #endif
@@ -228,6 +303,12 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     while (DDRC->DDR_MTCR & DDRC_DDR_MTCR_MT_EN_MASK);
 
 #if (!defined(DDR_NO_PHY))
+    /* Indicate that the RxReplica pathPhase initialization was performed
+       in the OEI by writing a special code key to DDRC DDR_MTP0 (register
+       not used during normal operations).
+     */
+    DDRC->DDR_MTP[0] = 0x0C0DE0E1U;
+
     /**
      * Enable auto clock gating feature
      * By default gate all options except GATE_DDRPHY_DFICLK
@@ -245,5 +326,32 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     DDRC->DDR_SDRAM_CFG_3 |= DDRC_DDR_SDRAM_CFG_3_SR_FAST_WK_EN_MASK;
 #endif
 
+    Ddr_Post_Init();
+
     return ret;
 }
+
+#if (!defined(DDR_NO_PHY))
+/*--------------------------------------------------------------------------*/
+/* Divide and round (up or down) function                                   */
+/*--------------------------------------------------------------------------*/
+static uint32_t DDR_SimpleDivRound(uint32_t val, uint32_t denom)
+{
+    uint32_t oneOrZero;
+    uint32_t absV;
+
+    oneOrZero = ((val % denom) >= (denom / 2U)) ? 1U : 0U;
+
+    /*
+     * False Positive: The variable oneOrZero can only have values 0 or 1.
+     * There is a theoretical wraparound scenario when val equals UINT32_MAX
+     * and denom is 1. However, the count variable is always either 128 or 100,
+     * which ensures that wrapping cannot occur.
+     * Therefore, this is a false positive.
+     */
+    // coverity[cert_int30_c_violation]
+    absV = (val / denom) + oneOrZero;
+
+    return absV;
+}
+#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 NXP
+ * Copyright 2023-2025 NXP
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -39,6 +39,7 @@
 
 /* Includes */
 
+#include "common.h"
 #include "fsl_mu.h"
 
 /* Defines */
@@ -166,6 +167,41 @@ typedef struct
     uint32_t reserved[8];    /*!< Reserved */
 } ele_info_t;
 
+/*!
+ * This type is used to communicate ELE TRNG state codes.
+ */
+typedef enum
+{
+    ELE_TRNG_PRG_MODE = 1, /*!< TRNG is in program mode */
+    ELE_TRNG_GEN_ENTR = 2, /*!< TRNG is still generating entropy */
+    ELE_TRNG_ENTR_VLD = 3, /*!< TRNG entropy is valid and ready to be read */
+    ELE_TRNG_ERR_ENCD = 4, /*!< TRNG encounter an error while generating entropy */
+} ele_trng_state_t;
+
+/*!
+ * This type is used to communicate ELE random context initialization state codes.
+ */
+typedef enum
+{
+    ELE_RND_CTIN_NOTD = 0, /*!< ELE random context initialization is not done yet */
+    ELE_RND_CTIN_ONGO = 1, /*!< ELE random context initialization is on-going */
+    ELE_RND_CTIN_SUCC = 2, /*!< ELE random context initialization succeeded */
+    ELE_RND_CTIN_FAIL = 3, /*!< ELE random context initialization failed */
+    ELE_RND_CTIN_PAUS = 4, /*!< ELE random context initialization is in "pause" mode */
+} ele_rnd_ctin_state_t;
+
+/*!
+ * This type is used to communicate ELE IEE install region requiest errors.
+ */
+typedef enum
+{
+    ELE_IEE_INST_REG_SUCCS = 0x0000, /*!< Success */
+    ELE_IEE_INST_REG_RNGNS = 0x0C29, /*!< RNG not started */
+    ELE_IEE_INST_REG_TRNGF = 0xBD29, /*!< TRNG failure */
+    ELE_IEE_INST_REG_INOOR = 0xBC29, /*!< Region index is out of range */
+    ELE_IEE_INST_REG_WRADR = 0xB429, /*!< Wrong address. Might overlap with an existing region */
+} ele_iee_inst_reg_state_t;
+
 /* Functions */
 
 /*!
@@ -198,6 +234,30 @@ int ELE_VerifyData(const void *dataAddr, uint32_t dataSize,
  */
 int ELE_ReleaseImageRam(uint32_t img_id, uint32_t *resp);
 
+/*!
+ * This function starts Random Number Generator
+ */
+int ELE_StartRng(void);
+
+/*!
+ * This function gets the Random Number Generator state
+ *
+ * @param[out]    trng     returns the random number generator state code
+ * @param[out]    rctin    returns random context initialization state code
+ */
+int ELE_GetTRngState(ele_trng_state_t *trng, ele_rnd_ctin_state_t *rctin);
+
+/*!
+ * This function enables Inline Encription Engine on the specified memory range
+ *
+ * @param[in]     startAddr memory start address
+ * @param[in]     endAddr   memory end address
+ * @param[in]     regIndex  region index uniquely identifying memory region
+ * @param[in]     lock      lock the region
+ * @param[out]    state     returns IEE install region requiest error
+ */
+int ELE_IeeInstallRegion(uint64_t startAddr, uint64_t endAddr, uint8_t regIndex, bool lock,
+                         ele_iee_inst_reg_state_t *state);
 #endif /* DRV_ELE_H */
 
 /** @} */

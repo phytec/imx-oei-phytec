@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2025 NXP
  */
-#ifndef __OEI_H
-#define __OEI_H
+#ifndef OEI_H
+#define OEI_H
 
 #include <stdint.h>
 #include <string.h>

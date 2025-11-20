@@ -1,0 +1,97 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2025-08-24T08:09:25Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.20"
+  },
+  "name": "imx-oei-LF_6.12.34_2.1.0",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/326a85cb-c80c-44c5-a94a-a2268825b8b5",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-326a85cb-c80c-44c5-a94a-a2268825b8b5",
+      "name": "imx-oei",
+      "versionInfo": "LF_6.12.34_2.1.0",
+      "licenseConcluded": "(BSD-3-Clause)",
+      "licenseDeclared": "(BSD-3-Clause)",
+      "downloadLocation": "https://github.com/nxp-imx/imx-oei -b lf-6.12.34-2.1.0",
+      "originator": "Organization: NXP",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-814fd893-9f29-4f2d-8b8f-21179b70f8eb",
+      "name": "arm-trusted-firmware",
+      "versionInfo": "v2.12",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "homepage": "https://github.com/ARM-software/arm-trusted-firmware",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: arm-trusted-firmware",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:o:arm:trusted_firmware-a:2.12:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:o:arm:arm_trusted_firmware:2.12:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:a:arm:trusted_firmware-a:2.12:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:o:arm:arm-trusted-firmware:2.12:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceLocator": "cpe:2.3:a:arm:arm_trusted_firmware:2.12:*:*:*:*:*:*:*",
+          "referenceType": "cpe23Type"
+        }
+      ],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-925e6340-449b-4c57-9ebd-558e6429b7db",
+      "name": "CMSIS_5",
+      "versionInfo": "5.4.0",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "homepage": "https://github.com/ARM-software/CMSIS_5",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: CMSIS_5",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-326a85cb-c80c-44c5-a94a-a2268825b8b5"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-326a85cb-c80c-44c5-a94a-a2268825b8b5",
+      "relationshipType": "DYNAMIC_LINK",
+      "relatedSpdxElement": "SPDXRef-package-925e6340-449b-4c57-9ebd-558e6429b7db"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-326a85cb-c80c-44c5-a94a-a2268825b8b5",
+      "relationshipType": "DYNAMIC_LINK",
+      "relatedSpdxElement": "SPDXRef-package-814fd893-9f29-4f2d-8b8f-21179b70f8eb"
+    }
+  ]
+}

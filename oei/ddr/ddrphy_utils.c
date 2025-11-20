@@ -101,44 +101,28 @@ int Wait_Ddr_Phy_Training_Complete(void)
     }
 }
 
-void Ddr_Phy_Init_Set_Dfi_Clk(unsigned int drate)
+void Ddr_Phy_Init_Set_Dfi_Clk(unsigned int drate, bool ssc)
 {
+    uint64_t rate = (uint64_t)drate;
+
+    rate *= 125000ULL; /** multiply to 1000000 (in MHz) and divide by 8 */
+
     switch (drate)
     {
     case 6400:
-        Dram_PLL_Init(MHZ(800));
-        Dram_Disable_Bypass();
-        break;
     case 4800:
-        Dram_PLL_Init(MHZ(600));
-        Dram_Disable_Bypass();
-        break;
     case 4266: /* Assume 4266 */
-        Dram_PLL_Init(533250000);
-        Dram_Disable_Bypass();
-        break;
     case 4000:
-        Dram_PLL_Init(MHZ(500));
-        Dram_Disable_Bypass();
-        break;
     case 3733: /* Assume 3733 */
-        Dram_PLL_Init(466625000);
-        Dram_Disable_Bypass();
-        break;
     case 3200:
-        Dram_PLL_Init(400000000);
-        Dram_Disable_Bypass();
-        break;
+    case 2133:
     case 1866: /* Assume 1866 */
-        Dram_PLL_Init(233250000);
-        Dram_Disable_Bypass();
-        break;
     case 1600:
-        Dram_PLL_Init(200000000);
+        Dram_PLL_Init(rate, ssc); /** drate/8 */
         Dram_Disable_Bypass();
         break;
     default:
-        printf("Clk rate not found\n");
+        printf("Clk rate %u not found\n", drate);
         return;
     }
 }

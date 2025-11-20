@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 NXP
+ * Copyright 2023-2025 NXP
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -68,6 +68,7 @@ typedef enum
     ELE_GET_EVENTS_REQ          = 0xA2,
     ELE_START_RNG_REQ           = 0xA3,
     ELE_GET_TRNG_STATE_REQ      = 0xA4,
+    ELE_IEE_INST_REGN_REQ       = 0xAA,
     ELE_ENABLE_PATCH_REQ        = 0xC3,
     ELE_RELEASE_RDC_REQ         = 0xC4,
     ELE_GET_FW_STATUS_REQ       = 0xC5,
@@ -202,7 +203,88 @@ int ELE_ReleaseImageRam(uint32_t img_id, uint32_t *resp)
     }
 
     return (s_msgMax.word[1] & 0xFF);
+}
 
+/*--------------------------------------------------------------------------*/
+/* ELE Start RNG                                                            */
+/*--------------------------------------------------------------------------*/
+int ELE_StartRng(void)
+{
+    /* Call ELE */
+    ELE_Call(&s_msgMax, ELE_START_RNG_REQ, 1U);
+
+    return (s_msgMax.word[1] & 0xFF);
+}
+
+/*--------------------------------------------------------------------------*/
+/* ELE Get TRNG State                                                       */
+/*--------------------------------------------------------------------------*/
+int ELE_GetTRngState(ele_trng_state_t *trng, ele_rnd_ctin_state_t *rctin)
+{
+    /* Call ELE */
+    ELE_Call(&s_msgMax, ELE_GET_TRNG_STATE_REQ, 1U);
+
+    /* Get the ELE TRNG state */
+    if (trng && s_msgMax.hdr.size > 2)
+    {
+        *trng = (ele_trng_state_t)(s_msgMax.word[2] & 0xFFU);
+    }
+
+    /* Get the ELE random context initialization state */
+    if (rctin && s_msgMax.hdr.size > 2)
+    {
+        *rctin = (ele_rnd_ctin_state_t)((s_msgMax.word[2] >> 8) & 0xFFU);
+    }
+
+    return (s_msgMax.word[1] & 0xFF);
+}
+
+/*--------------------------------------------------------------------------*/
+/* ELE IEE Install Region                                                   */
+/*--------------------------------------------------------------------------*/
+#define SIZE_64K    0x10000U
+#define ALIGN_SIZE  SIZE_64K
+int ELE_IeeInstallRegion(uint64_t startAddr, uint64_t endAddr, uint8_t regIndex, bool lock,
+                         ele_iee_inst_reg_state_t *state)
+{
+    uint32_t lockValue = (lock ? 1U : 0U) << 8U;
+    uint64_t algnStartAddr;
+    uint64_t algnEndAddr;
+
+    /**
+     * Align down to 64KB boundary the start address so that
+     * the required memory region is fully covered
+     */
+    algnStartAddr = ALIGN_DOWN(startAddr, ALIGN_SIZE);
+
+    /**
+     * Align up to 64KB boundary the end address so that
+     * the required memory region is fully covered.
+     *
+     * Substract 1 so that the address is the offset of
+     * the latest byte in the encrypted region.
+     */
+    algnEndAddr = ALIGN(endAddr, ALIGN_SIZE) - 1U;
+
+    /* Fill in parameters */
+    s_msgMax.word[1] = (lockValue | regIndex);
+    s_msgMax.word[2] = UINT64_H(algnStartAddr) & 0xFFU;   /** 40-bits Start Addr MSB */
+    s_msgMax.word[3] = UINT64_L(algnStartAddr);           /** 40-bits Start Addr LSB */
+    s_msgMax.word[4] = UINT64_H(algnEndAddr) & 0xFFU;     /** 40-bits End Addr MSB */
+    s_msgMax.word[5] = UINT64_L(algnEndAddr);             /** 40-bits End Addr LSB */
+    s_msgMax.word[6] = 0U;
+    s_msgMax.word[7] = 0U;
+
+    /* Call ELE */
+    ELE_Call(&s_msgMax, ELE_IEE_INST_REGN_REQ, 8U);
+
+    /* Get the ELE IEE install region requiest state */
+    if ((state) && (s_msgMax.hdr.size > 2))
+    {
+        *state = (ele_iee_inst_reg_state_t)(s_msgMax.word[2] & 0xFFFFU);
+    }
+
+    return (s_msgMax.word[1] & 0xFF);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -248,9 +330,12 @@ static void ELE_MuTx(ele_mu_msg_t *msg)
 #if defined(DEBUG_ELE)
     printf("ELE tx: 0x%08x ", buf[0]);
 #endif
+
+    /* Get message size */
+    size = (uint32_t) msg->hdr.size;
+
     /* Send message body */
-    size = ((uint32_t) msg->hdr.size) - 1UL;
-    while (size > 0U)
+    while (size > 1U)
     {
         MU_SendMsg(s_eleMuBase, pos % 8UL, buf[pos]);
 #if defined(DEBUG_ELE)
@@ -284,16 +369,16 @@ static void ELE_MuRx(ele_mu_msg_t *msg, uint8_t maxLen,
     if ((msg->hdr.tag == ELE_MSG_TAG_RESP)
        && (msg->hdr.ver == ELE_MSG_VER))
     {
-        uint8_t size;
-        uint8_t pos = 1U;
+        uint32_t size;
+        uint32_t pos = 1U;
 
         /* Get message size */
-        size = MIN(msg->hdr.size - 1U, maxLen - 1U);
+        size = (uint32_t) MIN(msg->hdr.size, maxLen);
 
         /* Get message body */
-        while (size > 0U)
+        while (size > 1U)
         {
-            buf[pos] = MU_ReceiveMsg(s_eleMuBase, ((uint32_t) pos) % 8UL);
+            buf[pos] = MU_ReceiveMsg(s_eleMuBase, pos % 8UL);
 #if defined(DEBUG_ELE)
             printf("0x%08x ", buf[pos]);
 #endif

@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2025 NXP
  */
-#ifndef __MSB_DDR4X_H
-#define __MSB_DDR4X_H
+#ifndef MSB_DDR4X_H
+#define MSB_DDR4X_H
 
 #include <stdint.h>
 

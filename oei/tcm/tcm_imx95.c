@@ -18,7 +18,6 @@ typedef struct
     unsigned int end_addr;
 } mem_tbl;
 
-
 /**
  * Checks and powers up M7MIX.
  *
@@ -31,9 +30,12 @@ typedef struct
  */
 static bool Power_Up_M7mix(void)
 {
-    if (*(volatile unsigned int *)SRC_M7MIX_SLICE_SW_CTRL != 0) {
-        *(volatile unsigned int *)SRC_M7MIX_SLICE_SW_CTRL = 0U;
-        while (*(volatile unsigned int *)SRC_M7MIX_SLICE_FUNC_STAT & 0x10);
+    if (SRC_XSPR_M7MIX->SLICE_SW_CTRL != 0)
+    {
+        SRC_XSPR_M7MIX->SLICE_SW_CTRL = 0U;
+
+        /** Wait isolation to go off, BIT(4) 1 => 0 */
+        while (SRC_XSPR_M7MIX->FUNC_STAT & SRC_XSPR_FUNC_STAT_ISO_STAT(1));
 
         return true;
     }
@@ -46,9 +48,12 @@ static bool Power_Up_M7mix(void)
  */
 static void Power_Down_M7mix(void)
 {
-    if (*(volatile unsigned int *)SRC_M7MIX_SLICE_SW_CTRL == 0) {
-        *(volatile unsigned int *)SRC_M7MIX_SLICE_SW_CTRL |= SW_CTRL_PDN_SOFT_MASK;
-        while (!*(volatile unsigned int *)SRC_M7MIX_SLICE_FUNC_STAT & 0x1);
+    if (SRC_XSPR_M7MIX->SLICE_SW_CTRL == 0)
+    {
+        SRC_XSPR_M7MIX->SLICE_SW_CTRL |= SRC_XSPR_SLICE_SW_CTRL_PDN_SOFT(1);
+
+        /** Wait power switch to go off, BIT(0) 0 => 1 */
+        while (!(SRC_XSPR_M7MIX->FUNC_STAT & SRC_XSPR_FUNC_STAT_PSW_STAT(1)));
     }
 }
 
@@ -57,7 +62,7 @@ static void Power_Down_M7mix(void)
  */
 static void Tcm_Retention(void)
 {
-    *(volatile unsigned int *)SRC_M7MIX_SLICE_MEM_CTRL |= MEM_CTRL_LP_MODE_MASK;
+    SRC_XSPR_M7MIX_MEM->MEM_CTRL |= SRC_MEM_MEM_CTRL_MEM_LP_MODE(1);
 }
 
 /**

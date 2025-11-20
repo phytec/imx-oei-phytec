@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2023-2024 NXP
+ * Copyright 2023-2025 NXP
  */
 
-#ifndef __TIME_H
-#define __TIME_H
+#ifndef TIME_H
+#define TIME_H
 
 #include <stdbool.h>
 #include <stdint.h>
