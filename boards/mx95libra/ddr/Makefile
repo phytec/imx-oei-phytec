@@ -1,4 +1,4 @@
-DDR_CONFIG ?= MIMX95_LPDDR5_EVK_19X19_6400MTS_FW2024.09_timing
+DDR_CONFIG ?= lpddr5_timing
 OBJS  += $(OUT)/$(DDR_CONFIG).o
 
-VPATH += boards/mx95lp5/ddr
+VPATH += boards/mx95libra/ddr
