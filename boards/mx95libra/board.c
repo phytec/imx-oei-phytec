@@ -59,12 +59,6 @@ void BOARD_InitDebugConsole(void)
 {
     if (s_uartConfig.base != NULL)
     {
-#if 0
-        uint64_t rate = CCM_RootGetRate(s_uartConfig.clockId);
-#else
-        uint64_t rate = 24000000;
-#endif
-
         /* Configure debug UART */
         lpuart_config_t lpuart_config;
         LPUART_GetDefaultConfig(&lpuart_config);
@@ -75,8 +69,7 @@ void BOARD_InitDebugConsole(void)
             FSL_FEATURE_LPUART_FIFO_SIZEn(s_uartConfig.base)) - 1U;
         lpuart_config.enableTx = true;
         lpuart_config.enableRx = true;
-        (void) LPUART_Init(s_uartConfig.base, &lpuart_config,
-            (uint32_t) rate & 0xFFFFFFFFU);
+        (void) LPUART_Init(s_uartConfig.base, &lpuart_config, 24000000);
     }
 }
 
