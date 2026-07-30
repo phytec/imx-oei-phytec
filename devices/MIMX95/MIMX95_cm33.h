@@ -43,6 +43,7 @@
 #include "MIMX95_CCM.h"
 #include "MIMX95_DDRC.h"
 #include "MIMX95_LPUART.h"
+#include "MIMX95_LPI2C.h"
 #include "MIMX95_MU.h"
 #include "MIMX95_PLL.h"
 #include "MIMX95_SRC_GEN.h"
