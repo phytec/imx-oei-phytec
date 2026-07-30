@@ -24,6 +24,7 @@ INCLUDE += \
 	-I$(SOC_DEVICE_DIR)/oei  \
 	-I$(DRIVER_DIR)/common  \
 	-I$(DRIVER_DIR)/edma  \
+	-I$(DRIVER_DIR)/lpi2c  \
 	-I$(DRIVER_DIR)/lpuart  \
 	-I$(DRIVER_DIR)/sysctr  \
 	-I$(COMPONENTS_DIR)/crc
@@ -37,6 +38,7 @@ VPATH += \
     $(SOC_DEVICE_DIR)/oei  \
     $(SOC_DEVICE_DIR)/$(cc)  \
     $(DRIVER_DIR)/edma  \
+    $(DRIVER_DIR)/lpi2c  \
     $(DRIVER_DIR)/lpuart  \
     $(DRIVER_DIR)/sysctr  \
     $(COMPONENTS_DIR)/crc
@@ -46,6 +48,7 @@ SDK_OBJS = \
     $(OUT)/fsl_ccm.o  \
     $(OUT)/fsl_clock.o  \
     $(OUT)/fsl_fract_pll.o  \
+    $(OUT)/fsl_lpi2c.o  \
     $(OUT)/fsl_power.o  \
     $(OUT)/fsl_src.o  \
     $(OUT)/fsl_sysctr.o
