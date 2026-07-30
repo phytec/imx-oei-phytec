@@ -46,6 +46,8 @@ LFLAGS += -flto
 FLAGS  += -flto
 endif
 
+# Configure toolchain
+OEI_CROSS_COMPILE ?= $(TOOLS)/arm-gnu-toolchain-*-none-eabi/bin/arm-none-eabi-
 ARCHFLAGS = -mcpu=cortex-$(cpu) -mthumb -mfloat-abi=soft
 
 cc = gcc
@@ -53,6 +55,7 @@ CC = $(CROSS_COMPILE)$(cc)
 LD = $(CROSS_COMPILE)$(cc)
 OBJCOPY = $(CROSS_COMPILE)objcopy
 OBJDUMP = $(CROSS_COMPILE)objdump
+READELF = $(CROSS_COMPILE)readelf
 SIZE = $(CROSS_COMPILE)size
 FLAGS += -DCPU_$(SOCFULL)_c$(cpu) -D$(SOC)
 

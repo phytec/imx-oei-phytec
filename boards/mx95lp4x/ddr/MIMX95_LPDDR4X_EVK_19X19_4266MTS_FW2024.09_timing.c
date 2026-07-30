@@ -1,10 +1,10 @@
 /*
- * Copyright 2025 NXP
+ * Copyright 2025-2026 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Code generated with DDR Tool v3.8.0_0.5-10acd9454.
- * DDR PHY FW2024.09
+ * Code generated with DDR Tool v4.1.0_1.2-bbe174500.
+ * DDR PHY FW2024.09-SP2
  * Chip revision: B0
  * Part number: NXP LPDDR4X EVK 19x19 board's default DDR part
  */
@@ -60,7 +60,7 @@ static struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg[] = {
     {0x5e080124, 0x20800000U},
     {0x5e080160, 0x00009102U},
     {0x5e08016C, 0x36F00000U},
-    {0x5e080170, 0x8C0C0608U},
+    {0x5e080170, 0x8E0E0608U},
     {0x5e080250, 0x0000002DU},
     {0x5e080254, 0x018E00B8U},
     {0x5e080258, 0x00000008U},
@@ -505,7 +505,6 @@ static struct ddrphy_cfg_param ddr_ddrphy_trained_csr[] = {
     {0x11014, 0x0},
     {0x12014, 0x0},
     {0x13014, 0x0},
-    {0x20037, 0x0},
     {0x2002c, 0x0},
     {0x2002d, 0x0},
     {0x20030, 0x0},
@@ -3766,12 +3765,12 @@ static struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
     {0x13042, 0xe0e},
     {0x13043, 0xe0e},
     {0x30040, 0xe0e},
-    {0x30041, 0xc0c},
+    {0x30041, 0xe0e},
     {0x30042, 0xe0e},
     {0x30043, 0xe0e},
     {0x30330, 0x33},
     {0x31040, 0xe0e},
-    {0x31041, 0xc0c},
+    {0x31041, 0xe0e},
     {0x31042, 0xe0e},
     {0x31043, 0xe0e},
     {0x31330, 0x33},
@@ -3841,7 +3840,6 @@ static struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
     {0x1100f, 0xa86},
     {0x1200f, 0xa86},
     {0x1300f, 0xa86},
-    {0x20037, 0x40},
     {0x2002c, 0x822},
     {0x2002d, 0x822},
     {0x20030, 0xa20},
@@ -6130,7 +6128,7 @@ static struct ddrphy_cfg_param ddr_phy_pie[] = {
 
 static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
     {
-        /* P0 4266mbps */
+        /* P0 4266mts */
         .drate = 4266,
         .ssc = false,
         .fsp_phy_cfg = ddr_phy_fsp0_cfg,

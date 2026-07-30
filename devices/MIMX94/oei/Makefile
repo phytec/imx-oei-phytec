@@ -1,6 +1,6 @@
 ## SPDX-License-Identifier: BSD-3-Clause
 ##
-## Copyright 2024 NXP
+## Copyright 2024-2025 NXP
 ##
 
 SERIES = MIMX9
@@ -51,6 +51,8 @@ SDK_OBJS = \
     $(OUT)/fsl_sysctr.o
 
 ifeq ($(DEBUG),1)
+OBJS  +=  \
+    $(OUT)/soc_printf.o
 SDK_OBJS += \
     $(OUT)/fsl_lpuart.o
 endif
@@ -58,7 +60,6 @@ endif
 OBJS  +=  \
     $(OUT)/soc_clock.o  \
     $(OUT)/soc_edma.o  \
-    $(OUT)/soc_printf.o  \
     $(OUT)/soc_time_cm33.o
 
 ifeq ($(OEI),ddr)

@@ -7,7 +7,7 @@
 **         CMSIS Peripheral Access Layer for MIMX95_cm33
 **
 **     Copyright 1997-2016 Freescale Semiconductor, Inc.
-**     Copyright 2016-2023 NXP
+**     Copyright 2016-2025 NXP
 **     SPDX-License-Identifier: BSD-3-Clause
 **
 **     http:                 www.nxp.com
@@ -4119,9 +4119,9 @@ typedef struct {
 
 /* DDRC - Peripheral instance base addresses */
 /** Peripheral DDRC base address */
-#define DDRC_BASE                                (0x4E080000u)
+#define DDRC_BASE                            (0x4E080000u)
 /** Peripheral DDRC base pointer */
-#define DDRC                                     ((DDRC_Type *)DDRC_BASE)
+#define DDRC                                 ((DDRC_Type *)DDRC_BASE)
 /** Array initializer of DDRC peripheral base addresses */
 #define DDRC_BASE_ADDRS                      { DDRC_BASE }
 /** Array initializer of DDRC peripheral base pointers */
@@ -4129,7 +4129,7 @@ typedef struct {
 
 #define DDRC_CTRL                            ((DDRC_Type *)DDRC_BASE)
 
-#define DDR_PHY_BASE                         (0x5E800000u)
+#define DDR_PHY_BASE                         (0x4E800000u)
 /*!
  * @}
  */ /* end of group DDRC_Peripheral_Access_Layer */

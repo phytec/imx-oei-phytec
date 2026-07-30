@@ -1,3 +1,8 @@
+## SPDX-License-Identifier: BSD-3-Clause
+##
+## Copyright 2023-2025 NXP
+##
+
 cpu     := m33
 SOC     := MIMX95
 SOCFULL := $(SOC)
@@ -14,9 +19,11 @@ INCLUDE +=  \
 	-I$(BOARDS_DIR)  \
 	-I$(BOARD_DIR)
 
+OBJS += \
+	$(OUT)/board.o
+
 ifeq ($(DEBUG),1)
 OBJS += \
-	$(OUT)/board.o  \
 	$(OUT)/pin_mux.o
 endif
 

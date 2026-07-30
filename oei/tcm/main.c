@@ -21,15 +21,12 @@ int oei_main(uint32_t argc, uint32_t *argv)
 	if (!timer_is_enabled())
 		timer_enable();
 
-	Clock_Init();
-#ifdef DEBUG
-	BOARD_InitPins();
-	BOARD_InitDebugConsole();
-#endif
+	/* Board specific hardware initialization */
+	BOARD_InitHardware();
 
 	printf("\n\nTCM OEI: start\n");
 #ifdef DEBUG
-        ts = SYSCTR_GetUsec64();
+	ts = SYSCTR_GetUsec64();
 #endif
 	ret = Tcm_Init();
 

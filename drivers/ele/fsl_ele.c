@@ -128,6 +128,9 @@ typedef union
 
 static void ELE_Call(ele_mu_msg_t *msg, ele_cmd_type_t cmd,
     uint8_t size);
+static void ELE_Call_Tx(ele_mu_msg_t *msg, ele_cmd_type_t cmd, uint8_t size);
+static void ELE_Call_Rx(ele_mu_msg_t *msg, ele_cmd_type_t cmd);
+
 static void ELE_MuTx(ele_mu_msg_t *msg);
 static void ELE_MuRx(ele_mu_msg_t *msg, uint8_t maxLen,
     ele_cmd_type_t cmd);
@@ -137,6 +140,56 @@ static void ELE_MuRx(ele_mu_msg_t *msg, uint8_t maxLen,
 // coverity[misra_c_2012_rule_19_2_violation:FALSE]
 static ele_mu_msg_t s_msgMax;
 static MU_Type *s_eleMuBase = MU_ELE0;
+static volatile bool s_eleRxInPogress = false;
+
+/*--------------------------------------------------------------------------*/
+/* ELE Get Info                                                             */
+/*--------------------------------------------------------------------------*/
+int ELE_GetInfo(ele_info_t *info)
+{
+    const volatile uint32_t data[sizeof(ele_info_t) / sizeof(uint32_t)];
+    uint32_t ret;
+
+    /* Fill in parameters */
+    s_msgMax.word[1] = 0U;
+    s_msgMax.word[2] = (uint32_t)&data;
+    s_msgMax.word[3] = sizeof(data);
+
+    /* Call ELE */
+    ELE_Call(&s_msgMax, ELE_GET_INFO_REQ, 4U);
+
+    ret = (s_msgMax.word[1] & 0xFF);
+
+    /* Extract data */
+    if (ret == ELE_SUCCESS_IND)
+    {
+        info->socId        = (uint16_t) (data[1] & 0x0000FFFFU);
+        info->socRev       = (uint16_t) ((data[1] >> 16U)  & 0x0000FFFFU);
+        info->lifecycle    = (uint16_t) (data[2] & 0x0000FFFFU);
+        info->sssmState    = (uint8_t)  ((data[2] >> 16U)  & 0x000000FFU);
+        info->attestApiVer = (uint8_t)  ((data[2] >> 24U)  & 0x000000FFU);
+        info->trngState    = (uint8_t)  (data[39] & 0x000000FFU);
+        info->csalState    = (uint8_t)  ((data[39] >> 8U)  & 0x000000FFU);
+        info->imemState    = (uint8_t)  ((data[39] >> 16U) & 0x000000FFU);
+
+        for (uint32_t idx = 0U; idx < 4U; idx++)
+        {
+            info->uid[idx] = data[idx + 3U];
+        }
+
+        for (uint32_t idx = 0U; idx < 8U; idx++)
+        {
+            info->shaPatch[idx] = data[idx + 7U];
+        }
+
+        for (uint32_t idx = 0U; idx < 8U; idx++)
+        {
+            info->shaFw[idx] = data[idx + 15U];
+        }
+    }
+
+    return ret;
+}
 
 #define ELE_SIGN    0x00d50000
 #define ELE_VERIFY  0x002a0000
@@ -153,6 +206,37 @@ int ELE_SignData(const void *dataAddr, uint32_t dataSize,
 
     /* Call ELE */
     ELE_Call(&s_msgMax, ELE_SIGN_VERIFY_REQ, 4U);
+
+    if (resp)
+    {
+        *resp = s_msgMax.word[1];
+    }
+
+    return (s_msgMax.word[1] & 0xFF);
+}
+
+/*--------------------------------------------------------------------------*/
+/* ELE Verify Data Tx                                                       */
+/*--------------------------------------------------------------------------*/
+void ELE_VerifyData_Tx(const void *dataAddr, uint32_t dataSize,
+                       const void *macAddr)
+{
+    /* Fill in parameters */
+    s_msgMax.word[1] = (uint32_t)dataAddr;
+    s_msgMax.word[2] = (uint32_t)macAddr;
+    s_msgMax.word[3] = ELE_VERIFY | dataSize;
+
+    /* Call ELE */
+    ELE_Call_Tx(&s_msgMax, ELE_SIGN_VERIFY_REQ, 4U);
+}
+
+/*--------------------------------------------------------------------------*/
+/* ELE Verify Data Rx                                                       */
+/*--------------------------------------------------------------------------*/
+int ELE_VerifyData_Rx(uint32_t *resp)
+{
+    /* Call ELE */
+    ELE_Call_Rx(&s_msgMax, ELE_SIGN_VERIFY_REQ);
 
     if (resp)
     {
@@ -242,36 +326,17 @@ int ELE_GetTRngState(ele_trng_state_t *trng, ele_rnd_ctin_state_t *rctin)
 /*--------------------------------------------------------------------------*/
 /* ELE IEE Install Region                                                   */
 /*--------------------------------------------------------------------------*/
-#define SIZE_64K    0x10000U
-#define ALIGN_SIZE  SIZE_64K
 int ELE_IeeInstallRegion(uint64_t startAddr, uint64_t endAddr, uint8_t regIndex, bool lock,
                          ele_iee_inst_reg_state_t *state)
 {
     uint32_t lockValue = (lock ? 1U : 0U) << 8U;
-    uint64_t algnStartAddr;
-    uint64_t algnEndAddr;
-
-    /**
-     * Align down to 64KB boundary the start address so that
-     * the required memory region is fully covered
-     */
-    algnStartAddr = ALIGN_DOWN(startAddr, ALIGN_SIZE);
-
-    /**
-     * Align up to 64KB boundary the end address so that
-     * the required memory region is fully covered.
-     *
-     * Substract 1 so that the address is the offset of
-     * the latest byte in the encrypted region.
-     */
-    algnEndAddr = ALIGN(endAddr, ALIGN_SIZE) - 1U;
 
     /* Fill in parameters */
     s_msgMax.word[1] = (lockValue | regIndex);
-    s_msgMax.word[2] = UINT64_H(algnStartAddr) & 0xFFU;   /** 40-bits Start Addr MSB */
-    s_msgMax.word[3] = UINT64_L(algnStartAddr);           /** 40-bits Start Addr LSB */
-    s_msgMax.word[4] = UINT64_H(algnEndAddr) & 0xFFU;     /** 40-bits End Addr MSB */
-    s_msgMax.word[5] = UINT64_L(algnEndAddr);             /** 40-bits End Addr LSB */
+    s_msgMax.word[2] = UINT64_H(startAddr) & 0xFFU;   /** 40-bits Start Addr MSB */
+    s_msgMax.word[3] = UINT64_L(startAddr);           /** 40-bits Start Addr LSB */
+    s_msgMax.word[4] = UINT64_H(endAddr) & 0xFFU;     /** 40-bits End Addr MSB */
+    s_msgMax.word[5] = UINT64_L(endAddr);             /** 40-bits End Addr LSB */
     s_msgMax.word[6] = 0U;
     s_msgMax.word[7] = 0U;
 
@@ -288,11 +353,17 @@ int ELE_IeeInstallRegion(uint64_t startAddr, uint64_t endAddr, uint8_t regIndex,
 }
 
 /*--------------------------------------------------------------------------*/
-/* Call ELE function                                                        */
+/* Call Tx ELE function                                                     */
 /*--------------------------------------------------------------------------*/
-// coverity[misra_c_2012_rule_19_2_violation:FALSE]
-static void ELE_Call(ele_mu_msg_t *msg, ele_cmd_type_t cmd, uint8_t size)
+static void ELE_Call_Tx(ele_mu_msg_t *msg, ele_cmd_type_t cmd, uint8_t size)
 {
+    while (s_eleRxInPogress)
+    {
+        ; /** Intentionally left empty */
+    }
+
+    s_eleRxInPogress = true;
+
     /* Setup message */
     msg->hdr.tag = ELE_MSG_TAG;
     msg->hdr.cmd = cmd;
@@ -301,10 +372,36 @@ static void ELE_Call(ele_mu_msg_t *msg, ele_cmd_type_t cmd, uint8_t size)
 
     /* Send message */
     ELE_MuTx(msg);
+}
+
+/*--------------------------------------------------------------------------*/
+/* Call Rx ELE function                                                     */
+/*--------------------------------------------------------------------------*/
+static void ELE_Call_Rx(ele_mu_msg_t *msg, ele_cmd_type_t cmd)
+{
+    while (!s_eleRxInPogress)
+    {
+        ; /** Intentionally left empty */
+    }
 
     /* Receive response */
     msg->word[1] = 0U;
     ELE_MuRx(msg, ELE_MSG_MAX_SIZE, cmd);
+
+    s_eleRxInPogress = false;
+}
+
+/*--------------------------------------------------------------------------*/
+/* Call ELE function                                                        */
+/*--------------------------------------------------------------------------*/
+// coverity[misra_c_2012_rule_19_2_violation:FALSE]
+static void ELE_Call(ele_mu_msg_t *msg, ele_cmd_type_t cmd, uint8_t size)
+{
+    /* Send message */
+    ELE_Call_Tx(msg, cmd, size);
+
+    /* Receive response */
+    ELE_Call_Rx(msg, cmd);
 }
 
 /*--------------------------------------------------------------------------*/

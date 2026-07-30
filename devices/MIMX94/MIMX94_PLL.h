@@ -139,7 +139,7 @@ typedef struct {
       __IO uint32_t CLR;                               /**< DFS Division_0..DFS Division_3, offset: 0x88, irregular array, not all indices are valid */
       __IO uint32_t TOG;                               /**< DFS Division_0..DFS Division_3, offset: 0x8C, irregular array, not all indices are valid */
     } DFS_DIV;
-  } NO_OF_DFS[4];
+  } DFS[4];
   __I  uint32_t PLL_STATUS;                        /**< PLL Status, offset: 0xF0 */
   __I  uint32_t DFS_STATUS;                        /**< DFS Status, offset: 0xF4, not available in all instances (available on 72 out of 192) */
 } PLL_Type;
@@ -287,59 +287,59 @@ typedef struct {
 /*! @name DFS - DFS Control */
 /*! @{ */
 
-#define PLL_NO_OF_DFS_HW_CTRL_SEL_MASK                 (0x10000U)
-#define PLL_NO_OF_DFS_HW_CTRL_SEL_SHIFT                (16U)
+#define PLL_DFS_HW_CTRL_SEL_MASK                 (0x10000U)
+#define PLL_DFS_HW_CTRL_SEL_SHIFT                (16U)
 /*! HW_CTRL_SEL - Hardware Control Select
  *  0b0..Disable. DFS is controlled by register.
  *  0b1..Enable. DFS is controlled by hardware inputs.
  */
-#define PLL_NO_OF_DFS_HW_CTRL_SEL(x)                   (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_HW_CTRL_SEL_SHIFT)) & PLL_NO_OF_DFS_HW_CTRL_SEL_MASK)
+#define PLL_DFS_HW_CTRL_SEL(x)                   (((uint32_t)(((uint32_t)(x)) << PLL_DFS_HW_CTRL_SEL_SHIFT)) & PLL_DFS_HW_CTRL_SEL_MASK)
 
-#define PLL_NO_OF_DFS_BYPASS_EN_MASK                   (0x800000U)
-#define PLL_NO_OF_DFS_BYPASS_EN_SHIFT                  (23U)
+#define PLL_DFS_BYPASS_EN_MASK                   (0x800000U)
+#define PLL_DFS_BYPASS_EN_SHIFT                  (23U)
 /*! BYPASS_EN - Bypass Enable
  *  0b0..Disable
  *  0b1..Enable
  */
-#define PLL_NO_OF_DFS_BYPASS_EN(x)                     (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_BYPASS_EN_SHIFT)) & PLL_NO_OF_DFS_BYPASS_EN_MASK)
+#define PLL_DFS_BYPASS_EN(x)                     (((uint32_t)(((uint32_t)(x)) << PLL_DFS_BYPASS_EN_SHIFT)) & PLL_DFS_BYPASS_EN_MASK)
 
-#define PLL_NO_OF_DFS_CLKOUT_DIVBY2_EN_MASK            (0x20000000U)
-#define PLL_NO_OF_DFS_CLKOUT_DIVBY2_EN_SHIFT           (29U)
+#define PLL_DFS_CLKOUT_DIVBY2_EN_MASK            (0x20000000U)
+#define PLL_DFS_CLKOUT_DIVBY2_EN_SHIFT           (29U)
 /*! CLKOUT_DIVBY2_EN - DFS Clock Output Divide by 2 Enable
  *  0b0..Disable
  *  0b1..Enable
  */
-#define PLL_NO_OF_DFS_CLKOUT_DIVBY2_EN(x)              (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_CLKOUT_DIVBY2_EN_SHIFT)) & PLL_NO_OF_DFS_CLKOUT_DIVBY2_EN_MASK)
+#define PLL_DFS_CLKOUT_DIVBY2_EN(x)              (((uint32_t)(((uint32_t)(x)) << PLL_DFS_CLKOUT_DIVBY2_EN_SHIFT)) & PLL_DFS_CLKOUT_DIVBY2_EN_MASK)
 
-#define PLL_NO_OF_DFS_CLKOUT_EN_MASK                   (0x40000000U)
-#define PLL_NO_OF_DFS_CLKOUT_EN_SHIFT                  (30U)
+#define PLL_DFS_CLKOUT_EN_MASK                   (0x40000000U)
+#define PLL_DFS_CLKOUT_EN_SHIFT                  (30U)
 /*! CLKOUT_EN - DFS Clock Output Enable
  *  0b0..Disable
  *  0b1..Enable
  */
-#define PLL_NO_OF_DFS_CLKOUT_EN(x)                     (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_CLKOUT_EN_SHIFT)) & PLL_NO_OF_DFS_CLKOUT_EN_MASK)
+#define PLL_DFS_CLKOUT_EN(x)                     (((uint32_t)(((uint32_t)(x)) << PLL_DFS_CLKOUT_EN_SHIFT)) & PLL_DFS_CLKOUT_EN_MASK)
 
-#define PLL_NO_OF_DFS_ENABLE_MASK                      (0x80000000U)
-#define PLL_NO_OF_DFS_ENABLE_SHIFT                     (31U)
+#define PLL_DFS_ENABLE_MASK                      (0x80000000U)
+#define PLL_DFS_ENABLE_SHIFT                     (31U)
 /*! ENABLE - DFS Block Enable
  *  0b0..Disable
  *  0b1..Enable
  */
-#define PLL_NO_OF_DFS_ENABLE(x)                        (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_ENABLE_SHIFT)) & PLL_NO_OF_DFS_ENABLE_MASK)
+#define PLL_DFS_ENABLE(x)                        (((uint32_t)(((uint32_t)(x)) << PLL_DFS_ENABLE_SHIFT)) & PLL_DFS_ENABLE_MASK)
 /*! @} */
 
 /*! @name DFS - DFS Division_0..DFS Division_3 */
 /*! @{ */
 
-#define PLL_NO_OF_DFS_MFN_MASK                         (0x7U)
-#define PLL_NO_OF_DFS_MFN_SHIFT                        (0U)
+#define PLL_DFS_MFN_MASK                         (0x7U)
+#define PLL_DFS_MFN_SHIFT                        (0U)
 /*! MFN - MFN */
-#define PLL_NO_OF_DFS_MFN(x)                           (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_MFN_SHIFT)) & PLL_NO_OF_DFS_MFN_MASK)
+#define PLL_DFS_MFN(x)                           (((uint32_t)(((uint32_t)(x)) << PLL_DFS_MFN_SHIFT)) & PLL_DFS_MFN_MASK)
 
-#define PLL_NO_OF_DFS_MFI_MASK                         (0xFF00U)
-#define PLL_NO_OF_DFS_MFI_SHIFT                        (8U)
+#define PLL_DFS_MFI_MASK                         (0xFF00U)
+#define PLL_DFS_MFI_SHIFT                        (8U)
 /*! MFI - MFI */
-#define PLL_NO_OF_DFS_MFI(x)                           (((uint32_t)(((uint32_t)(x)) << PLL_NO_OF_DFS_MFI_SHIFT)) & PLL_NO_OF_DFS_MFI_MASK)
+#define PLL_DFS_MFI(x)                           (((uint32_t)(((uint32_t)(x)) << PLL_DFS_MFI_SHIFT)) & PLL_DFS_MFI_MASK)
 /*! @} */
 
 /*! @name PLL_STATUS - PLL Status */

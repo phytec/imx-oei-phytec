@@ -375,7 +375,7 @@ bool FRACTPLL_GetDfsEnable(uint32_t pllIdx, uint8_t dfsIdx,
         {
             const PLL_Type *pll = s_pllPtrs[pllIdx];
 
-            if ((pll->NO_OF_DFS[dfsIdx].DFS_CTRL.RW & enMask) != 0U)
+            if ((pll->DFS[dfsIdx].DFS_CTRL.RW & enMask) != 0U)
             {
                 dfsEnable = true;
             }
@@ -401,11 +401,11 @@ bool FRACTPLL_SetDfsEnable(uint32_t pllIdx, uint8_t dfsIdx,
 
             if (enable)
             {
-                pll->NO_OF_DFS[dfsIdx].DFS_CTRL.SET = enMask;
+                pll->DFS[dfsIdx].DFS_CTRL.SET = enMask;
             }
             else
             {
-                pll->NO_OF_DFS[dfsIdx].DFS_CTRL.CLR = enMask;
+                pll->DFS[dfsIdx].DFS_CTRL.CLR = enMask;
             }
 
             updateEnable = true;
@@ -429,12 +429,12 @@ uint64_t FRACTPLL_GetDfsRate(uint32_t pllIdx, uint8_t dfsIdx,
         {
             const PLL_Type *pll = s_pllPtrs[pllIdx];
 
-            uint32_t divider = pll->NO_OF_DFS[dfsIdx].DFS_DIV.RW;
+            uint32_t divider = pll->DFS[dfsIdx].DFS_DIV.RW;
 
-            uint32_t mfi = (divider & PLL_NO_OF_DFS_MFI_MASK)
-                >> PLL_NO_OF_DFS_MFI_SHIFT;
-            uint32_t mfn = (divider & PLL_NO_OF_DFS_MFN_MASK)
-                >> PLL_NO_OF_DFS_MFN_SHIFT;
+            uint32_t mfi = (divider & PLL_DFS_MFI_MASK)
+                >> PLL_DFS_MFI_SHIFT;
+            uint32_t mfn = (divider & PLL_DFS_MFN_MASK)
+                >> PLL_DFS_MFN_SHIFT;
 
             rate = FRACTPLL_GetRate(pllIdx, true);
 
@@ -465,22 +465,22 @@ bool FRACTPLL_UpdateDfsRate(uint32_t pllIdx, uint8_t dfsIdx, uint32_t mfi,
             PLL_Type *pll = s_pllPtrs[pllIdx];
 
             /* Bypass DFS*/
-            pll->NO_OF_DFS[dfsIdx].DFS_CTRL.SET
-                = PLL_NO_OF_DFS_BYPASS_EN_MASK;
+            pll->DFS[dfsIdx].DFS_CTRL.SET
+                = PLL_DFS_BYPASS_EN_MASK;
             /* Disable output and DFS */
-            pll->NO_OF_DFS[dfsIdx].DFS_CTRL.CLR
-                = PLL_NO_OF_DFS_CLKOUT_EN_MASK
-                | PLL_NO_OF_DFS_ENABLE_MASK;
+            pll->DFS[dfsIdx].DFS_CTRL.CLR
+                = PLL_DFS_CLKOUT_EN_MASK
+                | PLL_DFS_ENABLE_MASK;
             /* Set mfi and mfn */
-            pll->NO_OF_DFS[dfsIdx].DFS_DIV.RW = PLL_NO_OF_DFS_MFI(mfi)
-                | PLL_NO_OF_DFS_MFN(mfn);
+            pll->DFS[dfsIdx].DFS_DIV.RW = PLL_DFS_MFI(mfi)
+                | PLL_DFS_MFN(mfn);
             /* Enable output and DFS*/
-            pll->NO_OF_DFS[dfsIdx].DFS_CTRL.SET
-                = PLL_NO_OF_DFS_CLKOUT_EN_MASK;
+            pll->DFS[dfsIdx].DFS_CTRL.SET
+                = PLL_DFS_CLKOUT_EN_MASK;
 
             /* Enable DFS for locking*/
-            pll->NO_OF_DFS[dfsIdx].DFS_CTRL.SET
-                = PLL_NO_OF_DFS_ENABLE_MASK;
+            pll->DFS[dfsIdx].DFS_CTRL.SET
+                = PLL_DFS_ENABLE_MASK;
 
             /* Wait for DFS clock output to be valid */
             uint32_t dfsOkMask = 1UL << dfsIdx;
@@ -490,8 +490,8 @@ bool FRACTPLL_UpdateDfsRate(uint32_t pllIdx, uint8_t dfsIdx, uint32_t mfi,
             }
 
             /* Clean bypass */
-            pll->NO_OF_DFS[dfsIdx].DFS_CTRL.CLR
-                = PLL_NO_OF_DFS_BYPASS_EN_MASK;
+            pll->DFS[dfsIdx].DFS_CTRL.CLR
+                = PLL_DFS_BYPASS_EN_MASK;
             __DSB();
             __ISB();
 

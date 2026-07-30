@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2026 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,7 +19,7 @@ struct clk_root_cfg {
 };
 
 static struct clk_root_cfg clk_root_cfgs[] = {
-	{ CLOCK_ROOT_DRAMAPB, CLOCK_SRC_SYSPLL1_PFD1_DIV2, 3 }, /* 400MHz / 3 = 133.(3) MHz */
+	{ CLOCK_ROOT_DRAMAPB, CLOCK_SRC_SYSPLL1_PFD1, 3 }, /* 800MHz / 3 = 266.67 MHz */
 #ifdef DEBUG
 #if (BOARD_DEBUG_UART_INSTANCE == 1)
 	{ CLOCK_ROOT_LPUART1, CLOCK_SRC_OSC24M, 1}, /* 24MHz */
@@ -57,15 +57,23 @@ struct fracpll_rate_table {
 };
 
 struct fracpll_rate_table fracpll_tbl[] = {
-	{ 4800000000ULL, 800000000ULL },
-	{ 4800000000ULL, 600000000ULL },
-	{ 4800000000ULL, 200000000ULL },
-	{ 3199500000ULL, 533250000ULL },
-	{ 4000000000ULL, 500000000ULL },
-	{ 3733000000ULL, 466625000ULL },
-	{ 3200000000ULL, 400000000ULL },
-	{ 3199500000ULL, 266625000ULL },
-	{ 3732000000ULL, 233250000ULL },
+	{ .vco = 4800000000ULL, .rate = 800000000ULL },
+	{ .vco = 4500000000ULL, .rate = 750000000ULL },
+	{ .vco = 4200000000ULL, .rate = 700000000ULL },
+	{ .vco = 4800000000ULL, .rate = 600000000ULL },
+	{ .vco = 4800000000ULL, .rate = 200000000ULL },
+	{ .vco = 3199500000ULL, .rate = 533250000ULL },
+	{ .vco = 4200000000ULL, .rate = 525000000ULL },
+	{ .vco = 4000000000ULL, .rate = 500000000ULL },
+	{ .vco = 3733000000ULL, .rate = 466625000ULL },
+	{ .vco = 3200000000ULL, .rate = 400000000ULL },
+	{ .vco = 4320000000ULL, .rate = 360000000ULL },
+	{ .vco = 4200000000ULL, .rate = 350000000ULL },
+	{ .vco = 3900000000ULL, .rate = 325000000ULL },
+	{ .vco = 4800000000ULL, .rate = 300000000ULL },
+	{ .vco = 3199500000ULL, .rate = 266625000ULL },
+	{ .vco = 4200000000ULL, .rate = 262500000ULL },
+	{ .vco = 3732000000ULL, .rate = 233250000ULL },
 };
 
 void Dram_PLL_Init(uint64_t pll_val, bool ssc)
@@ -103,9 +111,9 @@ void Dram_PLL_Init(uint64_t pll_val, bool ssc)
 
 void Dram_Disable_Bypass(void)
 {
-	/* Set DRAM APB to 133Mhz */
+	/* Set DRAM APB to 266.67 MHz */
 	(void) CCM_RootSetDiv(CLOCK_ROOT_DRAMAPB, 3U);
-	(void) CCM_RootSetParent(CLOCK_ROOT_DRAMAPB, CLOCK_SRC_SYSPLL1_PFD1_DIV2);
+	(void) CCM_RootSetParent(CLOCK_ROOT_DRAMAPB, CLOCK_SRC_SYSPLL1_PFD1);
 	(void) CCM_RootSetEnable(CLOCK_ROOT_DRAMAPB, 1);
 	/* Switch from DRAM  clock root from CCM to PLL */
 	(void) CCM_GprValSet(2, CCM_GPR_SHARED2_DRAM_PLL_BYPASS_MASK, 0);

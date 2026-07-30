@@ -3,8 +3,8 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Code generated with DDR Tool v3.8.0_8.2-10acd9454.
- * DDR PHY FW2024.09
+ * Code generated with DDR Tool v3.9.0_8.2-eff28b90a.
+ * DDR PHY FW2024.09-SP2
  * 
  * Part number: Unknown
  */
@@ -10619,7 +10619,7 @@ static struct ddrphy_cfg_param ddr_phy_pie[] = {
 
 static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
     {
-        /* P0 6400mbps */
+        /* P0 6400mts */
         .drate = 6400,
         .ssc = false,
         .fsp_phy_cfg = ddr_phy_fsp0_cfg,

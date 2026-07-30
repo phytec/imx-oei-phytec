@@ -143,11 +143,14 @@ $(OUT)/$(IMG).elf : $(OBJS)
 	$(AT)$(OBJDUMP) -D -S $(OUT)/$(IMG).elf > $(OUT)/$(IMG).dis
 	$(AT)$(SIZE) $(OUT)/$(IMG).elf
 
-clean:
+elfinfo : $(OUT)/$(IMG).elf
+	$(AT)$(READELF) -l $(OUT)/$(IMG).elf
+
+clean :
 	@echo "Cleaning ...."
 	$(AT)rm -f $(OUT)/*
 
-really-clean:
+really-clean :
 	@echo "Really cleaning ...."
 	$(AT)rm -rf $(BUILD)
 	$(AT)rm -f doc/build_info
@@ -170,6 +173,5 @@ help :
 	@/bin/echo -e "\tv=1                                 		: verbose compile logs, default: off"
 	@/bin/echo -e "\tLTO=1                               		: Enable Link Time opt, default: off"
 	@/bin/echo -e "\tDDR_CONFIG=file name (w/o .c)       		: Override DDR cfg filename, default: off"
-
 
 include ./oei/makefiles/build_info.mak

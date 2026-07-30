@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2022-2024 NXP
+ * Copyright 2022-2025 NXP
  */
 #include <stddef.h>
 #include <stdint.h>
 #include <errno.h>
+#include "crc.h"
+#include "common.h"
+#include "fsl_common.h"
 #include "oei.h"
 #include "soc_ddr.h"
 
@@ -92,7 +95,7 @@ int Ddrc_Config(struct dram_timing_info *dtiming, uint32_t fsp_id)
     return 0;
 }
 
-static void Ddr_PhyColdReset(void)
+static void Ddr_MixPowerUp(void)
 {
     /**
      * BIT(8) => src_ipc_ddrphy_presetn, PRESETN
@@ -116,9 +119,15 @@ static void Ddr_PhyColdReset(void)
     SRC_XSPR_DDRMIX->SLICE_SW_CTRL &= ~SRC_XSPR_SLICE_SW_CTRL_PDN_SOFT_MASK;
     /* Wait resets to be released => BIT(2) being set */
     while (!(SRC_XSPR_DDRMIX->FUNC_STAT & SRC_XSPR_FUNC_STAT_RST_STAT_MASK));
-    /* sleep for a while, just random */
+}
+
+static void Ddr_PhyColdReset(void)
+{
+    /* set RESET_N LOW, already LOW if function called after Ddr_MixPowerUp */
+    SRC_XSPR_DDRMIX->IRST_REQ_CTRL |= SRC_XSPR_IRST_REQ_CTRL_RSTR_1_IRST_1_MASK;
+    /* Reset duration is min 64 DfiClk, this time shall include 16 APBCLK below */
     SystemTimeDelay(8);
-    /* set PRESETN LOW after power-up */
+    /* set PRESETN LOW */
     SRC_XSPR_DDRMIX->IRST_REQ_CTRL |= SRC_XSPR_IRST_REQ_CTRL_RSTR_1_IRST_0_MASK;
     /* The delay below must be at least 16 APBCLK
      * APBCLK is @200MHz in waveform. Timer clock is @24MHz =>
@@ -166,13 +175,15 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     int ret = 0;
     uint32_t fsp_id, drate;
 #if (!defined(DDR_NO_PHY))
+    int qb_ret = 0;
     uint32_t acg;
 #endif
 
-    /* reset ddrphy */
-    Ddr_PhyColdReset();
+    /** Power up DDRMIX, prepare resets */
+    Ddr_MixPowerUp();
 
-    /**
+    /** Start DfiClk and APBCLK
+     *
      * FSP ID must point to the last trained FSP
      * so that the proper DDRC config - for the
      * last trained FSP - is loaded. This fits
@@ -183,16 +194,21 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     /* default to the last frequency point clock */
     Ddr_Phy_Init_Set_Dfi_Clk(drate, dtiming->fsp_msg[fsp_id].ssc);
 
+    /** Reset DDR PHY */
+    Ddr_PhyColdReset();
+
 #if (!defined(DDR_NO_PHY))
-    /** Verify training data loaded from non-volatile memory */
-    if (Ddr_Training_Data_Check(img_id))
+    /** Try to configure PHY in QuickBoot mode */
+    qb_ret = Ddr_Cfg_Phy_Qb(dtiming, fsp_id, img_id);
+    if (qb_ret < 0)
     {
-        /* Configure PHY in QuickBoot mode */
-        ret = Ddr_Cfg_Phy_Qb(dtiming, fsp_id);
-        if (ret) { return ret; }
+        /** QuckBoot flow failure, return error */
+        return qb_ret;
     }
-    else
+    else if (qb_ret > 0)
     {
+        /** QuickBoot flow signals inappropriate flow context, run Training flow */
+
         /* Move obtaining the Pathphase init values from SM to OEI after
            training perform this before Ddr_Phy_Qb_Save()
          */
@@ -205,6 +221,11 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
         uint32_t dbytes;
         uint16_t init = 0;
         uint32_t addr = 0;
+        ddrphy_qb_state *qb_state;
+        uint32_t size;
+
+        /** Reset DDR PHY */
+        Ddr_PhyColdReset();
 
         /*
          * Start PHY initialization and training by
@@ -216,61 +237,70 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
         /* CSR bus: MCU/PIE/DMA++,TDR/APB-- */
         Dwc_Ddrphy_Apb_Wr(0xd0000, 0x0);
 
-        /* Detect how many bytes are used in the DDR interface.
-           Cannot retrieve this information from the DDRC since
-           it has not been configured yet. Instead, we can get
-           this information from the DDR PHY CSR AcLnDisable. This tells
-           us which CA bus signals are disabled for each channel. For
-           channel B, this CSR address is 0x310ac. If any of the CA bus signals
-           are disabled (denoted by setting it to "1"), then this implies this
-           channel is disabled indicating we are in 16-bit (2 byte) mode.
-           This CSR definition changes depending on LP4 or LP5 mode, but in
-           either mode, bit[0] indicates CA0.
-           Hence, for simplicity, we can just read bit[0] which is ChB_CA0 and
-           if it returns "1", it means ChB is disabled.
+        /* Initial training of baseline RxReplica receive delay line values
+         * used by RxReplcia SW method. If the HW PHY methof of RxReplica
+         * is used, then do not execute this. To check if the HW method is
+         * used, read RxClkCntl1[EnRxClkCor]: if set, then HW mthod is used.
          */
-        if (((uint16_t)Dwc_Ddrphy_Apb_Rd(0x310acU) & 0x1U) == 0x1U)
+        if (((uint16_t)Dwc_Ddrphy_Apb_Rd(0x10057U) & 0x1U) == 0x0U)
         {
-            dbytes = 2U;
-        }
-        else
-        {
-            dbytes = 4U;
-        }
-
-        /* Obtain the baseline RxReplica receive delay line values by
-           taking 128 samples and averaging it, per byte lane, then store
-           this in RxReplicaCtl03.
-         */
-        for (idx = 0U; idx < dbytes; idx++)
-        {
-            sumpathphase = 0U;
-            loop = count;
-
-            /* Get path select */
-            /* RxReplicaCtl01: Specify which of the five
-             * RxReplicaPathPhase[0..4]
-             * to use for computing RxReplicaRatioNow.
+            /* Detect how many bytes are used in the DDR interface.
+               Cannot retrieve this information from the DDRC since
+               it has not been configured yet. Instead, we can get
+               this information from the DDR PHY CSR AcLnDisable. This tells
+               us which CA bus signals are disabled for each channel. For
+               channel B, this CSR address is 0x310ac. If any of the CA bus
+               signals are disabled (denoted by setting it to "1"), then this
+               implies this channel is disabled indicating we are in 16-bit
+               (2 byte) mode.
+               This CSR definition changes depending on LP4 or LP5 mode, but
+               in either mode, bit[0] indicates CA0.
+               Hence, for simplicity, we can just read bit[0] which is ChB_CA0
+               and if it returns "1", it means ChB is disabled.
              */
-            addr = 0x100adU + (idx << 12U);
-            pathsel[idx] = (uint16_t)(Dwc_Ddrphy_Apb_Rd(addr));
-
-            /* Obtain 128 samples of the receive delay line (pathphase) from
-               the RxReplica circuit
-             */
-            while (loop-- != 0U)
+            if (((uint16_t)Dwc_Ddrphy_Apb_Rd(0x310acU) & 0x1U) == 0x1U)
             {
-                addr = 0x100d0U + (idx << 12U) + pathsel[idx];
-                sumpathphase += (uint16_t)Dwc_Ddrphy_Apb_Rd(addr);
+                dbytes = 2U;
+            }
+            else
+            {
+                dbytes = 4U;
             }
 
-            /* Got Pathphase init values*/
-            init = (uint16_t)(DDR_SimpleDivRound(sumpathphase, count));
-            /* Store the receive dealy line (pathphase) baseline to
-               RxReplicaCtl03
+            /* Obtain the baseline RxReplica receive delay line values by
+               taking 128 samples and averaging it, per byte lane, then store
+               this in RxReplicaCtl03.
              */
-            addr = 0x100afU + (idx << 12U);
-            Dwc_Ddrphy_Apb_Wr(addr, init);
+            for (idx = 0U; idx < dbytes; idx++)
+            {
+                sumpathphase = 0U;
+                loop = count;
+
+                /* Get path select */
+                /* RxReplicaCtl01: Specify which of the five
+                 * RxReplicaPathPhase[0..4]
+                 * to use for computing RxReplicaRatioNow.
+                 */
+                addr = 0x100adU + (idx << 12U);
+                pathsel[idx] = (uint16_t)(Dwc_Ddrphy_Apb_Rd(addr));
+
+                /* Obtain 128 samples of the receive delay line (pathphase)
+                   from the RxReplica circuit
+                 */
+                while (loop-- != 0U)
+                {
+                    addr = 0x100d0U + (idx << 12U) + pathsel[idx];
+                    sumpathphase += (uint16_t)Dwc_Ddrphy_Apb_Rd(addr);
+                }
+
+                /* Got Pathphase init values*/
+                init = (uint16_t)(DDR_SimpleDivRound(sumpathphase, count));
+                /* Store the receive dealy line (pathphase) baseline to
+                   RxReplicaCtl03
+                 */
+                addr = 0x100afU + (idx << 12U);
+                Dwc_Ddrphy_Apb_Wr(addr, init);
+            }
         }
 
         Dwc_Ddrphy_Apb_Wr(0xd0000U, 0x1U);
@@ -280,6 +310,16 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
 
         /** Sign collected training data */
         Ddr_Training_Data_Sign(img_id);
+
+        /**
+         * Compute CRC32 over Training Data + Signature to
+         * be able to check the integrity of the data in
+         * the bootloader, before saving to NVM.
+         */
+        qb_state = (ddrphy_qb_state *)QB_STATE_SAVE_ADDR;
+
+        size = sizeof(ddrphy_qb_state) - sizeof(qb_state->crc);
+        qb_state->crc = CRC_Crc32((uint8_t *)qb_state->mac, size);
     }
 #endif
 
@@ -303,6 +343,26 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     while (DDRC->DDR_MTCR & DDRC_DDR_MTCR_MT_EN_MASK);
 
 #if (!defined(DDR_NO_PHY))
+
+    if (qb_ret > 0)
+    {
+        uint8_t max_tsize = 128; /* bytes */
+        uint64_t size;
+
+        /** Round size to a multiple of 128, so
+          * the maximum eDMA transfer size (128 bytes)
+          * can be used.
+          */
+        size = ALIGN(sizeof(ddrphy_qb_state), max_tsize);
+        size = MIN(size, QB_STATE_STORAGE_SIZE);
+
+        /** Copy qb data from NPU SRAM to DRAM,
+          * for bootloader to save to NVM.
+          */
+        Edma_Copy_Data(QB_STATE_SAVE_ADDR, max_tsize,
+                       QB_STATE_DDR_ADDR,  max_tsize, size);
+    }
+
     /* Indicate that the RxReplica pathPhase initialization was performed
        in the OEI by writing a special code key to DDRC DDR_MTP0 (register
        not used during normal operations).
@@ -325,8 +385,6 @@ int Ddrc_Init(struct dram_timing_info *dtiming, uint32_t img_id)
     /** Set SR_FAST_WK_EN in REG_DDR_SDRAM_CFG_3 */
     DDRC->DDR_SDRAM_CFG_3 |= DDRC_DDR_SDRAM_CFG_3_SR_FAST_WK_EN_MASK;
 #endif
-
-    Ddr_Post_Init();
 
     return ret;
 }

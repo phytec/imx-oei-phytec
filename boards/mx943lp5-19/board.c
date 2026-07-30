@@ -1,15 +1,17 @@
 /*
- * Copyright 2023-2024 NXP
+ * Copyright 2023-2025 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "clock.h"
 #include "oei.h"
 #include "board.h"
 #include "fsl_lpuart.h"
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
 
+#if defined(DEBUG)
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -77,4 +79,17 @@ void BOARD_InitDebugConsole(void)
         (void) LPUART_Init(s_uartConfig.base, &lpuart_config,
             (uint32_t) rate & 0xFFFFFFFFU);
     }
+}
+#endif
+
+/*--------------------------------------------------------------------------*/
+/* Initialize board                                                         */
+/*--------------------------------------------------------------------------*/
+void BOARD_InitHardware(void)
+{
+    Clock_Init();
+#if defined(DEBUG)
+    BOARD_InitPins();
+    BOARD_InitDebugConsole();
+#endif
 }

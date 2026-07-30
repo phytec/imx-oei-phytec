@@ -185,6 +185,7 @@ enum ddrfw_type
 
 typedef struct
 {
+    uint32_t crc;
 #define MAC_LENGTH             8 /** 256 bits, 32-bit aligned */
     uint32_t mac[MAC_LENGTH];    /** For 95A0/1 keep CRC32 value in mac[0] */
     uint8_t TrainedVREFCA_A0;
@@ -242,8 +243,19 @@ struct ddr_phy_ops
 
 extern struct ddr_phy_ops phy_ops;
 
-int Ddr_Cfg_Phy_Qb(struct dram_timing_info *timing_info, int fsp_id);
+int Ddr_Cfg_Phy_Qb(struct dram_timing_info *timing_info, uint32_t fsp_id, uint32_t img_id);
 void Ddr_Phy_Qb_Save(void);
+
+/*
+ * Copy data from SRC to DST using eDMA2
+ * @src_addr source address
+ * @src_tbytes eDMA src transfer size step (2/4/8/16/32/64/128 bytes)
+ * @dst_addr destination address
+ * @dst_tbytes eDMA dst transfer size step (2/4/8/16/32/64/128 bytes)
+ * @size total transfer size (unit is byte)
+ */
+void Edma_Copy_Data(uint32_t src_addr, uint32_t src_tbytes,
+                    uint32_t dst_addr, uint32_t dst_tbytes, uint32_t size);
 
 /**
  * Get training data location within the boot container.
@@ -263,6 +275,13 @@ uint32_t Get_Training_Data_Offset(uint32_t *offset);
 bool Ddr_Training_Data_Sign(uint32_t img_id);
 
 /**
+ * Triggers in non-blocking mode the training data check process
+ *
+ * @return    true if check is triggered properly, false otherwise
+ */
+bool Ddr_Training_Data_Check_Init(void);
+
+/**
  * Checks if loaded training data is valid and can be used
  * for quick boot flow.
  *
@@ -274,6 +293,11 @@ bool Ddr_Training_Data_Check(uint32_t img_id);
  * Invalidate valid training data once quick boot flow completed
  */
 void Ddr_Training_Data_Invalidate(void);
+
+/**
+ * Call implements the SoC specific DDR pre init sequence
+ */
+void Ddr_Pre_Init(void);
 
 /**
  * Call implements the SoC specific DDR post init sequence

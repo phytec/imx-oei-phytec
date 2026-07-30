@@ -1,12 +1,12 @@
 /*
- * Copyright 2025 NXP
+ * Copyright 2025-2026 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Code generated with DDR Tool v3.8.0_0.5-10acd9454.
- * DDR PHY FW2024.09
+ * Code generated with DDR Tool v4.1.0_1.2-bbe174500.
+ * DDR PHY FW2024.09-SP2
  * Chip revision: B0
- * Part number: NXP LPDDR4X EVK 15x15 board's default DDR part
+ * Part number: NXP LPDDR4X EVK and FRDM 15x15 board's default DDR part
  */
 
 #include "ddr.h"
@@ -22,8 +22,8 @@ static struct ddrc_cfg_param ddr_ddrc_cfg[] = {
     {0x5e080024, 0x80003ffU},
     {0x5e080028, 0x80000000U},
     {0x5e08002c, 0x7ffU},
-    {0x5e080080, 0x80000512U},
-    {0x5e080084, 0x80000512U},
+    {0x5e080080, 0x80800512U},
+    {0x5e080084, 0x80800512U},
     {0x5e080114, 0x1000U},
     {0x5e080260, 0x90080U},
     {0x5e08026c, 0x2040U},
@@ -60,9 +60,9 @@ static struct ddrc_cfg_param ddr_ddrc_cfg[] = {
 static struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg[] = {
     {0x5e080100, 0x25AF4211U},
     {0x5e080104, 0xF8FF001CU},
-    {0x5e080108, 0x444604F4U},
-    {0x5e08010C, 0x0015E1FCU},
-    {0x5e080124, 0x1E800800U},
+    {0x5e080108, 0x444608F4U},
+    {0x5e08010C, 0x001601FCU},
+    {0x5e080124, 0x1E800000U},
     {0x5e080160, 0x00009102U},
     {0x5e08016C, 0x35F00000U},
     {0x5e080170, 0x8B0B0608U},
@@ -71,8 +71,8 @@ static struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg[] = {
     {0x5e080258, 0x00000008U},
     {0x5e08025C, 0x00000400U},
     {0x5e080300, 0x24542413U},
-    {0x5e080304, 0x0174240FU},
-    {0x5e080308, 0x0A3C0F03U},
+    {0x5e080304, 0x0174280FU},
+    {0x5e080308, 0x0A400F03U},
 };
 
 /* PHY Initialize Configuration */
@@ -510,7 +510,6 @@ static struct ddrphy_cfg_param ddr_ddrphy_trained_csr[] = {
     {0x11014, 0x0},
     {0x12014, 0x0},
     {0x13014, 0x0},
-    {0x20037, 0x0},
     {0x2002c, 0x0},
     {0x2002d, 0x0},
     {0x20030, 0x0},
@@ -3771,12 +3770,12 @@ static struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
     {0x13042, 0xe0e},
     {0x13043, 0xe0e},
     {0x30040, 0xe0e},
-    {0x30041, 0xc0c},
+    {0x30041, 0xe0e},
     {0x30042, 0xe0e},
     {0x30043, 0xe0e},
     {0x30330, 0x33},
     {0x31040, 0xe0e},
-    {0x31041, 0xc0c},
+    {0x31041, 0xe0e},
     {0x31042, 0xe0e},
     {0x31043, 0xe0e},
     {0x31330, 0x33},
@@ -3846,7 +3845,6 @@ static struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
     {0x1100f, 0xa86},
     {0x1200f, 0xa86},
     {0x1300f, 0xa86},
-    {0x20037, 0x40},
     {0x2002c, 0x822},
     {0x2002d, 0x822},
     {0x20030, 0xa20},
@@ -6135,7 +6133,7 @@ static struct ddrphy_cfg_param ddr_phy_pie[] = {
 
 static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
     {
-        /* P0 4000mbps */
+        /* P0 4000mts */
         .drate = 4000,
         .ssc = false,
         .fsp_phy_cfg = ddr_phy_fsp0_cfg,

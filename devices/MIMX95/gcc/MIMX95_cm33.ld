@@ -1,34 +1,43 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2026 NXP
  */
 
 /* Entry Point */
 ENTRY(oei_entry)
 
+CM33_TCMU_OFFSET = 0x1FFC0000;
+BSS_STACK_OFFSET = 0x20019000;
 RETENTION_OFFSET = 0x2001A000;
 RETENTION_SIZE   = 0x00010000;
-STACK_SIZE       = DEFINED(__stack_size__) ? __stack_size__ : 0x400;
+STACK_SIZE       = 0x00000400;
+__StackTop       = RETENTION_OFFSET;
+__StackLimit     = __StackTop - STACK_SIZE;
 
 /**
  * M33 Code TCM (TCML) Free Space: 0x1FFC0000 - 0x1FFFFFFF - according to RM
- * M33 Sys  TCM (TCMU) Free Space: 0x30000000 - 0x3002DFFF - according to CM33 ROM
+ * M33 Sys  TCM (TCMU) Free Space: 0x20000000 - 0x20029FFF - according to CM33 ROM
+ * The region starting at 0x2002A000 is reserved by CM33 ROM
  */
 MEMORY {
 	/**
-	 * s_code length includes the attached Synopsys FW,
-	 * max size of m33-oei-ddrfw.bin is 0x50000 = 327680 bytes
+	 * s_code includes OEI binary having attached two sets of Synopsys FW - training
+	 * and quick boot. The memory allocated for resulting m33-oei-ddrfw.bin is
+	 * [0x1FFC0000..0x20018FFF], total: 0x59000 (364544) bytes
 	 */
-	s_code (rx) : ORIGIN = 0x1FFC0000, LENGTH = 0x00050000
+	s_code (rx) : ORIGIN = CM33_TCMU_OFFSET, LENGTH = (BSS_STACK_OFFSET - CM33_TCMU_OFFSET)
 	/**
-	 * s_data section is the mem since the end of s_code (0x1FFC0000 + 0x00050000)
-	 * till the start of the TCM memory used by ROM (starts at 0x2002C000)
+	 * s_data keeps BSS and stack, [0x20019000..0x20019FFF]
 	 */
-	s_data (rw) : ORIGIN = 0x20010000, LENGTH = 0x0001C000 /* end addr: 0x2002C000 */
+	s_data (rw) : ORIGIN = BSS_STACK_OFFSET, LENGTH = (RETENTION_OFFSET - BSS_STACK_OFFSET)
+	/**
+	 * s_retn keeps DDR retention data, [0x2001A000..0x20029FFF]
+	 */
+	s_retn (rw) : ORIGIN = RETENTION_OFFSET, LENGTH = RETENTION_SIZE
 }
 
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
-OUTPUT_ARCH(arm) 
+OUTPUT_ARCH(arm)
 
 SECTIONS
 {
@@ -66,6 +75,15 @@ SECTIONS
 		__END_BSS = .;
 	} > s_data
 
+	ASSERT(__START_BSS >= BSS_STACK_OFFSET, "s_data overflowed by BSS")
+
+	/* Initializes stack on the end of s_data */
+	.stack __StackLimit :
+	{
+		. = ALIGN(8);
+		. += STACK_SIZE;
+	} > s_data
+
 	.retention RETENTION_OFFSET :
 	{
 		. = ALIGN(4);
@@ -73,15 +91,5 @@ SECTIONS
 		. += RETENTION_SIZE;
 		. = ALIGN(4);
 		__RetentionEnd = .;
-	} > s_data
-
-	/* Initializes stack on the end of s_data */
-	__StackTop   = ORIGIN(s_data) + LENGTH(s_data);
-	__StackLimit = __StackTop - STACK_SIZE;
-
-	.stack __StackLimit :
-	{
-		. = ALIGN(8);
-		. += STACK_SIZE;
-	} > s_data
+	} > s_retn
 }

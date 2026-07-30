@@ -6,11 +6,8 @@
 #include "fsl_ele.h"
 #include "oei.h"
 
-#define SIZE_16M            0x01000000ULL
-
-#define M7_IMG_MAX_SIZE     SIZE_16M
 #define M7_DDR_ADDR_START   0x80000000ULL
-#define M7_DDR_ADDR_END     (M7_DDR_ADDR_START + M7_IMG_MAX_SIZE)
+#define M7_DDR_ADDR_END     0x89FFFFFFULL
 
 #define DDR_IEE_REG_START   M7_DDR_ADDR_START
 #define DDR_IEE_REG_END     M7_DDR_ADDR_END
@@ -25,6 +22,9 @@ void prepare_iee(void)
     /** Start the random number generator */
     rngRet = ELE_StartRng();
 }
+
+#define SIZE_64K    0x10000U
+#define ALIGN_SIZE  SIZE_64K
 
 int enable_iee(void)
 {
@@ -58,8 +58,25 @@ int enable_iee(void)
                  (rctin == ELE_RND_CTIN_SUCC))
         {
             ele_iee_inst_reg_state_t state = ELE_IEE_INST_REG_SUCCS;
+            uint64_t startAddr;
+            uint64_t endAddr;
 
-            ieeRet = ELE_IeeInstallRegion(DDR_IEE_REG_START, DDR_IEE_REG_END, 0U, false, &state);
+            /**
+             * Align down to 64KB boundary the start address so that
+             * the required memory region is fully covered
+             */
+            startAddr = ALIGN_DOWN(DDR_IEE_REG_START, ALIGN_SIZE);
+
+            /**
+             * Align up to 64KB boundary the end address so that
+             * the required memory region is fully covered.
+             *
+             * Substract 1 so that the address is the offset of
+             * the latest byte in the encrypted region.
+             */
+            endAddr = ALIGN(DDR_IEE_REG_END, ALIGN_SIZE) - 1U;
+
+            ieeRet = ELE_IeeInstallRegion(startAddr, endAddr, 0U, false, &state);
 
             if (ieeRet != ELE_SUCCESS_IND)
             {
@@ -71,8 +88,9 @@ int enable_iee(void)
             }
             else
             {
-                printf("DDR OEI: IEE enabled on 0x%08x..0x%08x\n",
-                       UINT64_L(DDR_IEE_REG_START), UINT64_L(DDR_IEE_REG_END));
+                printf("DDR OEI: IEE enabled on 0x%02x%08x..0x%02x%08x\n",
+                       UINT64_H(startAddr), UINT64_L(startAddr),
+                       UINT64_H(endAddr),   UINT64_L(endAddr));
                 ret = 0;
             }
         }

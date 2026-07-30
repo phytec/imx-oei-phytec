@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Copyright 2018, 2023-2024 NXP
+ * Copyright 2018, 2023-2025 NXP
  */
 
 #include <stdio.h>
@@ -109,16 +109,24 @@ void Ddr_Phy_Init_Set_Dfi_Clk(unsigned int drate, bool ssc)
 
     switch (drate)
     {
-    case 6400:
-    case 4800:
-    case 4266: /* Assume 4266 */
-    case 4000:
-    case 3733: /* Assume 3733 */
-    case 3200:
-    case 2133:
-    case 1866: /* Assume 1866 */
-    case 1600:
-        Dram_PLL_Init(rate, ssc); /** drate/8 */
+    case 6400: /* pll @ 800000000 */
+    case 6000: /* pll @ 750000000 */
+    case 5600: /* pll @ 700000000 */
+    case 4800: /* pll @ 600000000 */
+    case 4266: /* pll @ 533250000 */
+    case 4200: /* pll @ 525000000 */
+    case 4000: /* pll @ 500000000 */
+    case 3733: /* pll @ 466625000 */
+    case 3200: /* pll @ 400000000 */
+    case 2880: /* pll @ 360000000 */
+    case 2800: /* pll @ 350000000 */
+    case 2600: /* pll @ 325000000 */
+    case 2400: /* pll @ 300000000 */
+    case 2133: /* pll @ 266625000 */
+    case 2100: /* pll @ 262500000 */
+    case 1866: /* pll @ 233250000 */
+    case 1600: /* pll @ 200000000 */
+        Dram_PLL_Init(rate, ssc);
         Dram_Disable_Bypass();
         break;
     default:

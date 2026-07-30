@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "clock.h"
 #include "oei.h"
 #include "board.h"
 #include "rom_api.h"
@@ -66,15 +65,19 @@ int oei_main(uint32_t argc, uint32_t *argv)
 {
     int ret = 0;
     uint32_t offset = 0, id = 0;
+#if !defined(DEBUG)
+    uint32_t ts, te, *tdiff;
+#endif
 
     if (!timer_is_enabled())
         timer_enable();
 
-    Clock_Init();
-#ifdef DEBUG
-    BOARD_InitPins();
-    BOARD_InitDebugConsole();
+#if !defined(DEBUG)
+    ts = SYSCTR_GetUsec64();
 #endif
+
+    /* Board specific hardware initialization */
+    BOARD_InitHardware();
 
 #ifdef DDR_IEE
     prepare_iee();
@@ -83,7 +86,7 @@ int oei_main(uint32_t argc, uint32_t *argv)
     printf("\nDDR OEI: (Build %lu, Commit %08lx, %s %s)\n\n",
         OEI_BUILD, OEI_COMMIT, OEI_DATE, OEI_TIME);
 
-    printf("DDR OEI: SOC %s, Board %s\n", OEI_DEVICES, OEI_BOARD);
+    printf("DDR OEI: Compiled for SOC %s, Board %s\n", OEI_DEVICES, OEI_BOARD);
     /**
      * Pass offset = 0 for iMX95 A0 since there is no ROM support
      * for training data dummy entry
@@ -94,6 +97,8 @@ int oei_main(uint32_t argc, uint32_t *argv)
         id = argv[2];
     }
 
+    Ddr_Pre_Init();
+
     ret = Ddr_Load_Training_Data(offset);
     if (ret != ROM_API_OKAY)
     {
@@ -101,6 +106,8 @@ int oei_main(uint32_t argc, uint32_t *argv)
     }
 
     ret = Ddrc_Init(&dram_timing, id);
+
+    Ddr_Post_Init();
 
 #ifdef DDR_IEE
     if (ret == 0)
@@ -115,6 +122,13 @@ int oei_main(uint32_t argc, uint32_t *argv)
     }
 #endif
     printf("DDR OEI: done, err = %d\n", ret);
+
+#if !defined(DEBUG)
+    te = SYSCTR_GetUsec64();
+
+    tdiff = (uint32_t *) (QB_STATE_SAVE_ADDR - sizeof(*tdiff));
+    (*tdiff) = te - ts;
+#endif
 
     return ret;
 }
