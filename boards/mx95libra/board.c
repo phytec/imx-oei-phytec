@@ -7,6 +7,7 @@
 #include "clock.h"
 #include "oei.h"
 #include "board.h"
+#include "fsl_lpi2c.h"
 #include "fsl_lpuart.h"
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
@@ -90,4 +91,30 @@ void BOARD_InitHardware(void)
     BOARD_InitPins();
     BOARD_InitDebugConsole();
 #endif
+    BOARD_InitSerialBus();
+}
+
+/*--------------------------------------------------------------------------*/
+/* Initialize serial bus for external devices                               */
+/*--------------------------------------------------------------------------*/
+void BOARD_InitSerialBus(void) {
+    static LPI2C_Type *const s_i2cBases[] = LPI2C_BASE_PTRS;
+    LPI2C_Type *base = s_i2cBases[BOARD_I2C_INSTANCE];
+    lpi2c_master_config_t lpi2cConfig = { };
+    static uint32_t const s_i2cClks[] = {
+        0U,
+        CLOCK_ROOT_LPI2C1,
+        CLOCK_ROOT_LPI2C2
+    };
+    uint32_t clockId = s_i2cClks[BOARD_I2C_INSTANCE];
+
+    /* bug, reduce width from 64 to 32 */
+    uint64_t rate = CCM_RootGetRate(clockId);
+
+    LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
+
+    lpi2cConfig.baudRate_Hz = BOARD_I2C_BAUDRATE;
+    lpi2cConfig.enableDoze = false;
+
+    LPI2C_MasterInit(base, &lpi2cConfig, rate);
 }
