@@ -50,7 +50,7 @@ SDK_OBJS = \
     $(OUT)/fsl_src.o  \
     $(OUT)/fsl_sysctr.o
 
-ifeq ($(DEBUG),1)
+ifeq ($(CONSOLE),1)
 OBJS  +=  \
     $(OUT)/soc_printf.o
 SDK_OBJS += \

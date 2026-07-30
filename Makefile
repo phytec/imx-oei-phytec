@@ -48,10 +48,16 @@ export AT
 ifdef d
     DEBUG := $(d)
 endif
+CONSOLE ?= 1
 DEBUG ?= 0
 
+# DEBUG depends on debug console being enabled
 ifeq ($(DEBUG),1)
     FLAGS += -DDEBUG
+	CONSOLE = 1
+endif
+ifeq ($(CONSOLE),1)
+    FLAGS += -DCONSOLE
 endif
 
 # Configure board
@@ -134,7 +140,7 @@ $(OUT)/%.o : %.S
 
 $(OUT)/$(IMG) : $(OBJS)
 	@echo "Linking $@ ...."
-	$(AT)$(LD) -o $@ $(OBJS) $(LFLAGS) 
+	$(AT)$(LD) -o $@ $(OBJS) $(LFLAGS)
 
 $(OUT)/$(IMG).elf : $(OBJS)
 	@echo "Linking $@ ...."
@@ -168,6 +174,7 @@ help :
 	@/bin/echo -e "\toei=ddr/tcm                         		: OEI type,             default: ddr"
 	@/bin/echo -e "\tr=A0/B0                             		: SOC revision,         default: A0"
 	@/bin/echo -e "\tDEBUG=1 or d=1                      		: enable debug output,  default: off"
+	@/bin/echo -e "\tCONSOLE=0                                  : disable console output,default: on"
 	@/bin/echo -e "\tt=1                                 		: enable OEI self-test, default: off"
 	@/bin/echo -e "\tiee=1                               		: Enable IEE,           default: off"
 	@/bin/echo -e "\tv=1                                 		: verbose compile logs, default: off"

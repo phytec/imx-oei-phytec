@@ -86,7 +86,7 @@ void BOARD_InitDebugConsole(void)
 void BOARD_InitHardware(void)
 {
     Clock_Init();
-#if defined(DEBUG)
+#if defined(CONSOLE)
     BOARD_InitPins();
     BOARD_InitDebugConsole();
 #endif
