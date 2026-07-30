@@ -4,7 +4,7 @@ include $(ROOT_DIR)/oei/$(OEI)/Makefile
 OBJS += \
 	$(OUT)/oei_entry.o
 
-ifeq ($(DEBUG), 1)
+ifeq ($(CONSOLE), 1)
 OBJS += \
 	$(OUT)/printf.o
 endif

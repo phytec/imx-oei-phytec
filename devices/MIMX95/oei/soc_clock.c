@@ -20,13 +20,13 @@ struct clk_root_cfg {
 
 static struct clk_root_cfg clk_root_cfgs[] = {
 	{ CLOCK_ROOT_DRAMAPB, CLOCK_SRC_SYSPLL1_PFD1, 3 }, /* 800MHz / 3 = 266.67 MHz */
-#ifdef DEBUG
+#ifdef CONSOLE
 #if (BOARD_DEBUG_UART_INSTANCE == 1)
 	{ CLOCK_ROOT_LPUART1, CLOCK_SRC_OSC24M, 1}, /* 24MHz */
 #elif (BOARD_DEBUG_UART_INSTANCE == 2)
 	{ CLOCK_ROOT_LPUART2, CLOCK_SRC_OSC24M, 1}, /* 24MHz */
 #endif
-#endif
+#endif /* CONSOLE */
 };
 
 int clk_root_set_rate_enable(uint32_t id, uint32_t src, uint32_t div, bool enable)
