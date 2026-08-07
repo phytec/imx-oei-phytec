@@ -11,6 +11,7 @@
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
 
+#if defined(CONSOLE)
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -72,6 +73,7 @@ void BOARD_InitDebugConsole(void)
         (void) LPUART_Init(s_uartConfig.base, &lpuart_config, 24000000);
     }
 }
+#endif
 
 /*--------------------------------------------------------------------------*/
 /* Initialize board                                                         */
@@ -79,6 +81,8 @@ void BOARD_InitDebugConsole(void)
 void BOARD_InitHardware(void)
 {
     Clock_Init();
+#if defined(CONSOLE)
     BOARD_InitPins();
     BOARD_InitDebugConsole();
+#endif
 }
