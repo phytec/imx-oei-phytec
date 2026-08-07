@@ -49,9 +49,15 @@ ifdef d
     DEBUG := $(d)
 endif
 DEBUG ?= 0
+CONSOLE ?= 1
 
 ifeq ($(DEBUG),1)
     FLAGS += -DDEBUG
+    CONSOLE = 1
+endif
+
+ifeq ($(CONSOLE),1)
+    FLAGS += -DCONSOLE
 endif
 
 # Configure board
