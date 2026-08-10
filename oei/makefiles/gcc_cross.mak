@@ -47,7 +47,6 @@ FLAGS  += -flto
 endif
 
 # Configure toolchain
-OEI_CROSS_COMPILE ?= $(TOOLS)/arm-gnu-toolchain-*-none-eabi/bin/arm-none-eabi-
 ARCHFLAGS = -mcpu=cortex-$(cpu) -mthumb -mfloat-abi=soft
 
 cc = gcc
