@@ -2,7 +2,8 @@ include $(ROOT_DIR)/devices/$(SOC)/oei/Makefile
 include $(ROOT_DIR)/oei/$(OEI)/Makefile
 
 OBJS += \
-	$(OUT)/oei_entry.o
+	$(OUT)/oei_entry.o \
+	$(OUT)/snprintf.o
 
 ifeq ($(CONSOLE), 1)
 OBJS += \
