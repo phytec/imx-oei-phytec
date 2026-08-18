@@ -3,8 +3,10 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include <stdio.h>
 
 #include "clock.h"
+#include "eeprom.h"
 #include "oei.h"
 #include "board.h"
 #include "eeprom.h"
@@ -12,6 +14,9 @@
 #include "fsl_lpuart.h"
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
+#ifdef PHYTEC_SOM_DETECTION
+#include "imx95_som_detection.h"
+#endif
 
 /*******************************************************************************
  * Variables
@@ -48,9 +53,10 @@ static board_uart_config_t const s_uartConfig =
     .inst = BOARD_DEBUG_UART_INSTANCE
 };
 
-static EEPROM_Type som_eeprom = {
-    .i2cBase = s_i2cBases[BOARD_I2C_INSTANCE],
-    .devAddr = BOARD_M24C32_DEV_ADDR,
+static EEPROM_Type som_eeprom = {};
+
+static eeprom_data m24c32 = {
+    .addrSize = 2
 };
 
 /*******************************************************************************
@@ -108,6 +114,24 @@ void BOARD_InitHardware(void)
     BOARD_InitDebugConsole();
 #endif
     BOARD_InitSerialBus();
+
+    som_eeprom.i2cBase = s_i2cBases[BOARD_I2C_INSTANCE];
+    som_eeprom.devAddr = BOARD_M24C32_DEV_ADDR;
+    status_t err = EEPROM_Init(&som_eeprom, m24c32);
+    if (err != kStatus_Success) {
+        printf("EEPROM Init failed\n");
+    }
+
+#ifdef PHYTEC_SOM_DETECTION
+    struct phytec_eeprom_data data = {};
+	int ret = phytec_eeprom_data_setup(&data, 0, 0x51);
+	if (!ret) {
+		ret = phytec_imx95_detect(&data);
+		if (!ret)
+			phytec_print_som_info(&data);
+	}
+#endif
+
 }
 
 /*--------------------------------------------------------------------------*/
