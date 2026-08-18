@@ -7,6 +7,7 @@
 #include "clock.h"
 #include "oei.h"
 #include "board.h"
+#include "eeprom.h"
 #include "fsl_lpi2c.h"
 #include "fsl_lpuart.h"
 #include "fsl_ccm.h"
@@ -15,8 +16,14 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+
+/* Factory EEPROM I2C device addresses */
+#define BOARD_M24C32_DEV_ADDR  0x51U
+
 /* Debug UART base pointer list */
 static LPUART_Type *const s_uartBases[] = LPUART_BASE_PTRS;
+/* LPI2C base pointer list */
+static LPI2C_Type *const s_i2cBases[] = LPI2C_BASE_PTRS;
 
 /* Debug UART clock list */
 static uint32_t const s_uartClks[] =
@@ -41,9 +48,18 @@ static board_uart_config_t const s_uartConfig =
     .inst = BOARD_DEBUG_UART_INSTANCE
 };
 
+static EEPROM_Type som_eeprom = {
+    .i2cBase = s_i2cBases[BOARD_I2C_INSTANCE],
+    .devAddr = BOARD_M24C32_DEV_ADDR,
+};
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+status_t BOARD_EepromRead(uint32_t const off, size_t const count, uint8_t data[static count]) {
+    return EEPROM_Read(&som_eeprom, off, count, data);
+}
 
 /*--------------------------------------------------------------------------*/
 /* Return the debug UART info                                               */
@@ -98,7 +114,6 @@ void BOARD_InitHardware(void)
 /* Initialize serial bus for external devices                               */
 /*--------------------------------------------------------------------------*/
 void BOARD_InitSerialBus(void) {
-    static LPI2C_Type *const s_i2cBases[] = LPI2C_BASE_PTRS;
     LPI2C_Type *base = s_i2cBases[BOARD_I2C_INSTANCE];
     lpi2c_master_config_t lpi2cConfig = { };
     static uint32_t const s_i2cClks[] = {

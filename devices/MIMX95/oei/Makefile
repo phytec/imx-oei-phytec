@@ -27,7 +27,8 @@ INCLUDE += \
 	-I$(DRIVER_DIR)/lpi2c  \
 	-I$(DRIVER_DIR)/lpuart  \
 	-I$(DRIVER_DIR)/sysctr  \
-	-I$(COMPONENTS_DIR)/crc
+	-I$(COMPONENTS_DIR)/crc \
+	-I$(COMPONENTS_DIR)/eeprom
 
 VPATH += \
     $(DEVICE_DIR)  \
@@ -41,7 +42,8 @@ VPATH += \
     $(DRIVER_DIR)/lpi2c  \
     $(DRIVER_DIR)/lpuart  \
     $(DRIVER_DIR)/sysctr  \
-    $(COMPONENTS_DIR)/crc
+    $(COMPONENTS_DIR)/crc \
+    $(COMPONENTS_DIR)/eeprom
 
 SDK_OBJS = \
     $(OUT)/edma.o  \
@@ -79,7 +81,8 @@ OBJS  += \
     $(OUT)/fsl_mu.o \
     $(OUT)/fsl_ele.o \
     $(OUT)/crc.o \
-    $(OUT)/crc8.o
+    $(OUT)/crc8.o \
+	$(OUT)/eeprom.o
 endif
 
 OBJS += $(SDK_OBJS) $(OEI_OBJS)
