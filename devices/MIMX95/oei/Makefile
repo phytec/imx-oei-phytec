@@ -63,6 +63,7 @@ SDK_OBJS += \
 endif
 
 OBJS  +=  \
+    $(OUT)/eeprom.o \
     $(OUT)/soc_clock.o  \
     $(OUT)/soc_edma.o  \
     $(OUT)/soc_time_cm33.o
@@ -82,7 +83,6 @@ OBJS  += \
     $(OUT)/fsl_ele.o \
     $(OUT)/crc.o \
     $(OUT)/crc8.o \
-	$(OUT)/eeprom.o \
     $(OUT)/imx95_som_detection.o
 
 ifeq ($(PHYTEC_SOM_DETECTION), 1)
