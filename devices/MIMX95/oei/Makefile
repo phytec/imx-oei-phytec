@@ -78,7 +78,8 @@ OBJS  += \
     $(OUT)/soc_ddr.o \
     $(OUT)/fsl_mu.o \
     $(OUT)/fsl_ele.o \
-    $(OUT)/crc.o
+    $(OUT)/crc.o \
+    $(OUT)/crc8.o
 endif
 
 OBJS += $(SDK_OBJS) $(OEI_OBJS)
