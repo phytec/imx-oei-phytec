@@ -49,6 +49,13 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include "common.h"
+
+/* Defines */
+
+/** CRC8 polynomial */
+#define CRC8_POLY 0x07
 
 /* Functions */
 
@@ -94,6 +101,22 @@ uint8_t CRC_J1850(const uint8_t *addr, uint32_t size);
  */
 uint32_t CRC_Crc32(const uint8_t *addr, uint32_t size);
 
+/**
+ * @brief Generic function for computing CRC 8
+ *
+ * Compute CRC 8 by passing in the address of the input, the input length
+ * and polynomial used in addition to the initial value.
+ *
+ * @param[in] src Input bytes for the computation
+ * @param[in] len Length of the input in bytes
+ * @param[in] polynomial The polynomial to use omitting the leading x^8 coefficient
+ * @param[in] initial_value Initial value for the CRC computation
+ * @param[in] reversed Should we use reflected/reversed values or not
+ *
+ * @return The computed CRC8 value
+ */
+uint8_t CRC_Crc8(const uint8_t *src, size_t len, uint8_t polynomial, uint8_t initial_value,
+                 bool reversed);
 /** @} */
 
 #endif /* CRC_H */
