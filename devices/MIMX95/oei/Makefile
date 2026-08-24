@@ -82,7 +82,12 @@ OBJS  += \
     $(OUT)/fsl_ele.o \
     $(OUT)/crc.o \
     $(OUT)/crc8.o \
-	$(OUT)/eeprom.o
+	$(OUT)/eeprom.o \
+    $(OUT)/imx95_som_detection.o
+
+ifeq ($(PHYTEC_SOM_DETECTION), 1)
+FLAGS += -DPHYTEC_IMX95_SOM_DETECTION
+endif
 endif
 
 OBJS += $(SDK_OBJS) $(OEI_OBJS)
