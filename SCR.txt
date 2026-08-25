@@ -8,6 +8,7 @@ Type of Content:  source
 Description:      IMX Optional Executable Image
 Release Location: https://github.com/nxp-imx/imx-oei
 Origin:           NXP
+                  PHYTEC
                   CMSIS (Apache-2.0) - https://github.com/ARM-software/CMSIS_5/releases/tag/5.4.0
                   aeabi_memset-thumb2.S (BSD-3-Clause) - https://sourceware.org/git/?p=newlib-cygwin.git;a=tree;h=refs/tags/cygwin-3_3_6-release
                   (sn)printf.c (BSD-3-Clause) - https://github.com/ARM-software/arm-trusted-firmware/tree/master
