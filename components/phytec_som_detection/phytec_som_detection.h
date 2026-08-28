@@ -35,17 +35,27 @@ enum {
 enum phytec_som_type_str {
     SOM_TYPE_PCM = 0,
     SOM_TYPE_PCL,
-    SOM_TYPE_KSM,
     SOM_TYPE_KSP,
-    SOM_TYPE_PFL_G,
+    SOM_TYPE_KSM,
+    SOM_TYPE_PCM_KSP,
+    SOM_TYPE_PCL_KSP,
+    SOM_TYPE_PCM_KSM,
+    SOM_TYPE_PCL_KSM,
+    SOM_TYPE_PFL_G_PT,
+    SOM_TYPE_PFL_G_SP,
+    SOM_TYPE_PFL_G_KP,
+    SOM_TYPE_PFL_G_KM,
+    SOM_TYPE_NUM,
 };
 
-static const char * const phytec_som_type_str[] = {
+static const char * const phytec_som_type_str[SOM_TYPE_NUM] = {
     "PCM",
     "PCL",
-    "KSM",
     "KSP",
-    "PFL-G",
+    "KSM",
+    "KSP", "KSP",
+    "KSM", "KSM",
+    "PFL-G", "PFL-G", "PFL-G", "PFL-G",
 };
 
 struct phytec_api2_data {
