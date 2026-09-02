@@ -15,6 +15,9 @@
 
 #define PHYTEC_API2_DATA_LEN	32
 
+#define PHYTEC_GET_OPTION(option) \
+	(((option) > '9') ? (option) - 'A' + 10 : (option) - '0')
+
 #define PHYTEC_PRODUCT_NAME_PCX_LEN	7	// PCx-000
 #define PHYTEC_PRODUCT_NAME_PFL_LEN	8	// PFL-x-00
 #define PHYTEC_PRODUCT_NAME_KSP_LEN	8	// KSP-0000

@@ -122,6 +122,7 @@ void BOARD_InitHardware(void)
 		if (!ret)
 			phytec_print_som_info(&data);
 	}
+    phytec_imx95_set_dram_timings(phytec_get_imx95_ddr_size(&data));
 #endif
 
 }
