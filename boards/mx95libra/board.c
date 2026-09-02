@@ -126,6 +126,10 @@ void BOARD_InitHardware(void)
 		if (!ret)
 			phytec_print_som_info(&data);
 	}
+    err = phytec_imx95_set_dram_timings(PHYTEC_IMX95_DDR_8GB);
+    if (err != kStatus_Success) {
+        printf("Error setting dram timings: %u\n", err);
+    }
 #endif
 
 }
