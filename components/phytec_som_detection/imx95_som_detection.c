@@ -9,6 +9,28 @@
 
 #ifdef PHYTEC_IMX95_SOM_DETECTION
 
+status_t phytec_imx95_set_dram_timings(enum phytec_imx95_ddr_eeprom_code opt) {
+    switch (opt) {
+        case PHYTEC_IMX95_DDR_1GB:
+            __fallthrough;
+        case PHYTEC_IMX95_DDR_2GB:
+            __fallthrough;
+        case PHYTEC_IMX95_DDR_4GB:
+            /* 1,2,4 GB Unsupported */
+            return kStatus_InvalidArgument;
+        case PHYTEC_IMX95_DDR_8GB:
+            /* default; do nothing */
+            break;
+        case PHYTEC_IMX95_DDR_16GB:
+            __fallthrough;
+        default:
+            /* 16 GB and any other option value unsupported */
+            return kStatus_Fail;
+            break;
+    };
+    return kStatus_Success;
+}
+
 /* Check if the SoM is actually one of the following products:
  * - i.MX95
  *
@@ -45,6 +67,10 @@ uint8_t __maybe_unused phytec_imx95_detect(struct phytec_eeprom_data *data)
 inline uint8_t __maybe_unused phytec_imx95_detect(struct phytec_eeprom_data *data)
 {
     return 1;
+}
+
+status_t phytec_imx95_set_dram_timings(enum phytec_imx95_ddr_eeprom_code opt) {
+    return kStatus_Fail;
 }
 
 #endif /* PHYTEC_IMX95_SOM_DETECTION */

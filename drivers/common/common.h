@@ -20,5 +20,6 @@
  */
 #define __maybe_unused  __attribute__((__unused__))
 #define __packed        __attribute__((__packed__))
+#define __fallthrough   __attribute__((__fallthrough__))
 
 #endif /* COMMON_H */
