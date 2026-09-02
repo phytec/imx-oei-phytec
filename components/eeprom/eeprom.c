@@ -6,8 +6,19 @@
 #include "eeprom.h"
 #include "fsl_common.h"
 
-status_t EEPROM_Init(EEPROM_Type *dev, eeprom_data eeprom) {
-    dev->data = eeprom;
+static eeprom_data const m24c32 = {
+    .addrSize = 2
+};
+
+static eeprom_data eeprom_chips[EEPROM_TYPE_SENTINEL] = {
+    [M24C32] = m24c32,
+};
+
+status_t EEPROM_Init(EEPROM_Type *dev, enum eeprom_type chip) {
+    if (chip >= EEPROM_TYPE_SENTINEL) {
+        return kStatus_InvalidArgument;
+    }
+    dev->data = eeprom_chips[chip];
 
     /* Check that device is ready */
     uint8_t testByte = {};

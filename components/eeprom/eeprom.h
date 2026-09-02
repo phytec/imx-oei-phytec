@@ -37,6 +37,10 @@ typedef struct {
     eeprom_data data;    /*!< EEPROM chip info */
 } EEPROM_Type;
 
+enum eeprom_type {
+    M24C32 = 0,
+    EEPROM_TYPE_SENTINEL,
+};
 
 /* Functions */
 
@@ -49,11 +53,11 @@ typedef struct {
  * Initialize EEPROM
  *
  * @param[in] dev device info
- * @param[in] eeprom EEPROM chip info
+ * @param[in] chip EEPROM chip enum
  *
  * @return Returns error code.
  */
-status_t EEPROM_Init(EEPROM_Type *dev, eeprom_data eeprom);
+status_t EEPROM_Init(EEPROM_Type *dev, enum eeprom_type chip);
 
 /*!
  * read data from EEPROM

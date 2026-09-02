@@ -55,10 +55,6 @@ static board_uart_config_t const s_uartConfig =
 
 static EEPROM_Type som_eeprom = {};
 
-static eeprom_data m24c32 = {
-    .addrSize = 2
-};
-
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -117,7 +113,7 @@ void BOARD_InitHardware(void)
 
     som_eeprom.i2cBase = s_i2cBases[BOARD_I2C_INSTANCE];
     som_eeprom.devAddr = BOARD_M24C32_DEV_ADDR;
-    status_t err = EEPROM_Init(&som_eeprom, m24c32);
+    status_t err = EEPROM_Init(&som_eeprom, M24C32);
     if (err != kStatus_Success) {
         printf("EEPROM Init failed\n");
     }
