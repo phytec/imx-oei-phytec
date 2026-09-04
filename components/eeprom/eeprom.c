@@ -6,9 +6,7 @@
 #include "eeprom.h"
 #include "fsl_common.h"
 
-status_t EEPROM_Init(EEPROM_Type *dev, eeprom_data eeprom) {
-    dev->data = eeprom;
-
+status_t EEPROM_Init(EEPROM_Type *dev) {
     /* Check that device is ready */
     uint8_t testByte = {};
     status_t err = EEPROM_Read(dev, 0, 1, &testByte);
@@ -27,7 +25,7 @@ status_t EEPROM_Read(EEPROM_Type const *dev, uint32_t const subAddr, uint8_t con
         .slaveAddress = dev->devAddr,
         .direction = kLPI2C_Read,
         .subaddress = subAddr,
-        .subaddressSize = dev->data.addrSize,
+        .subaddressSize = dev->addrSize,
         .data = buf,
         .dataSize = bufSize,
     };
