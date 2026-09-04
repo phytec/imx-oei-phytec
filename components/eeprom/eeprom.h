@@ -24,17 +24,11 @@
 
 /* Definitions */
 
-
-/*! EEPROM configuration structure. */
-typedef struct {
-    uint8_t addrSize;
-} eeprom_data;
-
 /*! EEPROM device info */
 typedef struct {
-    LPI2C_Type *i2cBase; /*!< I2C base address */
-    uint8_t     devAddr; /*!< Device I2C address */
-    eeprom_data data;    /*!< EEPROM chip info */
+    LPI2C_Type *i2cBase;  /*!< I2C base address */
+    uint8_t     devAddr;  /*!< Device I2C address */
+    uint8_t     addrSize; /*!< EEPROM I2C address size in bytes */
 } EEPROM_Type;
 
 
@@ -49,11 +43,10 @@ typedef struct {
  * Initialize EEPROM
  *
  * @param[in] dev device info
- * @param[in] eeprom EEPROM chip info
  *
  * @return Returns error code.
  */
-status_t EEPROM_Init(EEPROM_Type *dev, eeprom_data eeprom);
+status_t EEPROM_Init(EEPROM_Type *dev);
 
 /*!
  * read data from EEPROM
