@@ -3,10 +3,9 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <stdio.h>
 
+#include <stdio.h>
 #include "clock.h"
-#include "eeprom.h"
 #include "oei.h"
 #include "board.h"
 #include "eeprom.h"
