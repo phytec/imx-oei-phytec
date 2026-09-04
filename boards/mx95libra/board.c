@@ -4,19 +4,31 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <stdio.h>
 #include "clock.h"
 #include "oei.h"
 #include "board.h"
+#include "eeprom.h"
+#include "fsl_lpi2c.h"
 #include "fsl_lpuart.h"
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
+#ifdef PHYTEC_SOM_DETECTION
+#include "imx95_som_detection.h"
+#endif
 
 #if defined(CONSOLE)
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+
+/* Factory EEPROM I2C device addresses */
+#define BOARD_M24C32_DEV_ADDR  0x51U
+
 /* Debug UART base pointer list */
 static LPUART_Type *const s_uartBases[] = LPUART_BASE_PTRS;
+/* LPI2C base pointer list */
+static LPI2C_Type *const s_i2cBases[] = LPI2C_BASE_PTRS;
 
 /* Debug UART clock list */
 static uint32_t const s_uartClks[] =
@@ -41,9 +53,19 @@ static board_uart_config_t const s_uartConfig =
     .inst = BOARD_DEBUG_UART_INSTANCE
 };
 
+static EEPROM_Type som_eeprom = {
+    .i2cBase = s_i2cBases[BOARD_I2C_INSTANCE],
+    .devAddr = BOARD_M24C32_DEV_ADDR,
+    .addrSize = 2,
+};
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+status_t BOARD_EepromRead(uint32_t const off, size_t const count, uint8_t data[static count]) {
+    return EEPROM_Read(&som_eeprom, off, count, data);
+}
 
 /*--------------------------------------------------------------------------*/
 /* Return the debug UART info                                               */
@@ -85,4 +107,45 @@ void BOARD_InitHardware(void)
     BOARD_InitPins();
     BOARD_InitDebugConsole();
 #endif
+    BOARD_InitSerialBus();
+
+    status_t err = EEPROM_Init(&som_eeprom);
+    if (err != kStatus_Success) {
+        printf("EEPROM Init failed\n");
+    }
+
+#ifdef PHYTEC_SOM_DETECTION
+    struct phytec_eeprom_data data = {};
+	int ret = phytec_eeprom_data_setup(&data, 0, 0x51);
+	if (!ret) {
+		ret = phytec_imx95_detect(&data);
+		if (!ret)
+			phytec_print_som_info(&data);
+	}
+#endif
+
+}
+
+/*--------------------------------------------------------------------------*/
+/* Initialize serial bus for external devices                               */
+/*--------------------------------------------------------------------------*/
+void BOARD_InitSerialBus(void) {
+    LPI2C_Type *base = s_i2cBases[BOARD_I2C_INSTANCE];
+    lpi2c_master_config_t lpi2cConfig = { };
+    static uint32_t const s_i2cClks[] = {
+        0U,
+        CLOCK_ROOT_LPI2C1,
+        CLOCK_ROOT_LPI2C2
+    };
+    uint32_t clockId = s_i2cClks[BOARD_I2C_INSTANCE];
+
+    /* bug, reduce width from 64 to 32 */
+    uint64_t rate = CCM_RootGetRate(clockId);
+
+    LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
+
+    lpi2cConfig.baudRate_Hz = BOARD_I2C_BAUDRATE;
+    lpi2cConfig.enableDoze = false;
+
+    LPI2C_MasterInit(base, &lpi2cConfig, rate);
 }

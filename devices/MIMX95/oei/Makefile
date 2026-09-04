@@ -24,9 +24,11 @@ INCLUDE += \
 	-I$(SOC_DEVICE_DIR)/oei  \
 	-I$(DRIVER_DIR)/common  \
 	-I$(DRIVER_DIR)/edma  \
+	-I$(DRIVER_DIR)/lpi2c  \
 	-I$(DRIVER_DIR)/lpuart  \
 	-I$(DRIVER_DIR)/sysctr  \
-	-I$(COMPONENTS_DIR)/crc
+	-I$(COMPONENTS_DIR)/crc \
+	-I$(COMPONENTS_DIR)/eeprom
 
 VPATH += \
     $(DEVICE_DIR)  \
@@ -37,15 +39,18 @@ VPATH += \
     $(SOC_DEVICE_DIR)/oei  \
     $(SOC_DEVICE_DIR)/$(cc)  \
     $(DRIVER_DIR)/edma  \
+    $(DRIVER_DIR)/lpi2c  \
     $(DRIVER_DIR)/lpuart  \
     $(DRIVER_DIR)/sysctr  \
-    $(COMPONENTS_DIR)/crc
+    $(COMPONENTS_DIR)/crc \
+    $(COMPONENTS_DIR)/eeprom
 
 SDK_OBJS = \
     $(OUT)/edma.o  \
     $(OUT)/fsl_ccm.o  \
     $(OUT)/fsl_clock.o  \
     $(OUT)/fsl_fract_pll.o  \
+    $(OUT)/fsl_lpi2c.o  \
     $(OUT)/fsl_power.o  \
     $(OUT)/fsl_src.o  \
     $(OUT)/fsl_sysctr.o
@@ -58,6 +63,7 @@ SDK_OBJS += \
 endif
 
 OBJS  +=  \
+    $(OUT)/eeprom.o \
     $(OUT)/soc_clock.o  \
     $(OUT)/soc_edma.o  \
     $(OUT)/soc_time_cm33.o
@@ -75,7 +81,13 @@ OBJS  += \
     $(OUT)/soc_ddr.o \
     $(OUT)/fsl_mu.o \
     $(OUT)/fsl_ele.o \
-    $(OUT)/crc.o
+    $(OUT)/crc.o \
+    $(OUT)/crc8.o \
+    $(OUT)/imx95_som_detection.o
+
+ifeq ($(PHYTEC_SOM_DETECTION), 1)
+FLAGS += -DPHYTEC_IMX95_SOM_DETECTION
+endif
 endif
 
 OBJS += $(SDK_OBJS) $(OEI_OBJS)

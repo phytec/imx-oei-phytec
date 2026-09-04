@@ -44,6 +44,16 @@ extern "C" {
  * API
  ******************************************************************************/
 
+/*! Read data from the board eeprom
+ *
+ * @param[in] off Register offset to start reading from
+ * @param[in] count Number of registers/bytes to read
+ * @param[out] data Data read from the device registers
+ *
+ * @return Returns error code.
+ */
+status_t BOARD_EepromRead(uint32_t const off, size_t const count, uint8_t data[static count]);
+
 /*! Init hardware */
 void BOARD_InitHardware(void);
 
@@ -62,6 +72,9 @@ const board_uart_config_t *BOARD_GetDebugUart(void);
 
 /*! Init the debug UART */
 void BOARD_InitDebugConsole(void);
+
+/*! Init the EEPROM I2C bus controller*/
+void BOARD_InitSerialBus(void);
 
 #if defined(__cplusplus)
 }

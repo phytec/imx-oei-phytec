@@ -56,6 +56,11 @@
 /*! Config for UART baudrate */
 #define BOARD_DEBUG_UART_BAUDRATE    115200U
 
+/*! Config for EEPROM I2C instance */
+#define BOARD_I2C_INSTANCE           1U
+/*! Config for EEPROM I2C baudrate */
+#define BOARD_I2C_BAUDRATE           400000U
+
 #endif /* CONFIG_BOARD_H */
 
 /** @} */

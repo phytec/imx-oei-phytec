@@ -67,6 +67,8 @@ endif
 # Default to mx95libra
 SOM ?= mx95libra
 
+PHYTEC_SOM_DETECTION ?= 0
+
 # Configure SOC revision
 ifdef r
     R := $(r)
