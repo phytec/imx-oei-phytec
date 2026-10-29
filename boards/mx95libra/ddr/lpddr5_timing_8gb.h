@@ -38,6 +38,6 @@ extern struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg[DDR_8GB_PHY_PIE_FSP0_CFG_NUM
 extern struct ddrphy_cfg_param ddr_phy_pie[DDR_8GB_PHY_PIE_NUM];
 extern struct dram_fsp_msg ddr_dram_fsp_msg[DDR_8GB_FSP_MSG_NUM];
 extern struct dram_fsp_cfg ddr_dram_fsp_cfg[DDR_8GB_FSP_CFG_NUM];
-extern const struct dram_timing_info dram_timing;
+extern const struct dram_timing_info dram_timing_8gb;
 
 #endif /* __LPDDR5_TIMING_8GB_H__ */

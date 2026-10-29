@@ -10642,7 +10642,7 @@ struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 };
 
 /* ddr timing config params */
-const struct dram_timing_info dram_timing = {
+const struct dram_timing_info dram_timing_8gb = {
     .ddrc_cfg = ddr_ddrc_cfg,
     .ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
     .ddrphy_cfg = ddr_ddrphy_cfg,
