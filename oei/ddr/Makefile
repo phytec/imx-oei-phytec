@@ -25,6 +25,8 @@ OBJS  += \
 	$(OUT)/ddrphy_qb_gen.o \
 	$(OUT)/romapi.o
 
+FLAGS += -DDDR_TIMING_INIT
+
 ifeq ($(PHYTEC_SOM_DETECTION), 1)
 FLAGS += -DPHYTEC_SOM_DETECTION
 INCLUDE += -I$(COMPONENTS_DIR)/phytec_som_detection

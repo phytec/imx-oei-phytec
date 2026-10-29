@@ -17,7 +17,8 @@ BOARD_DIR = $(BOARDS_DIR)/$(SOM)
 
 INCLUDE +=  \
 	-I$(BOARDS_DIR)  \
-	-I$(BOARD_DIR)
+	-I$(BOARD_DIR) \
+	-I$(BOARD_DIR)/ddr
 
 OBJS += \
 	$(OUT)/board.o
