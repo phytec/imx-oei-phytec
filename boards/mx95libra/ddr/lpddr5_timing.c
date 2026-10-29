@@ -10997,3 +10997,479 @@ void set_dram_timings_4gb(void)
         dram_timing.fsp_msg->fsp_phy_pie_cfg,
         dram_timing.fsp_msg->fsp_phy_pie_cfg_num);
 }
+
+/*
+ * 1GB variant register differences.
+ */
+
+/* dram_timing.ddrc_cfg (ddr_ddrc_cfg) */
+static const struct ddrc_cfg_param ddr_ddrc_cfg_diff_1gb[] = {
+    {0x5e080110, 0x41110001U},
+    {0x5e080000, 0x3fU},
+    {0x5e080010, 0x0U},
+    {0x5e080024, 0x8000bffU},
+    {0x5e080080, 0x80800222U},
+    {0x5e080084, 0x0U}
+};
+
+/* dram_timing.fsp_cfg[0].ddrc_cfg (ddr_dram_fsp0_ddrc_cfg) */
+static const struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg_diff_1gb[] = {
+    {0x5e080100, 0x41000U},
+    {0x5e080104, 0x330006U},
+    {0x5e080108, 0x81820e25U},
+    {0x5e08010c, 0x10282008U},
+    {0x5e080124, 0x6030000U},
+    {0x5e080160, 0x0U},
+    {0x5e08016c, 0x1100000U},
+    {0x5e080170, 0x8a010409U},
+    {0x5e080250, 0x110509U},
+    {0x5e080254, 0x1c001cU},
+    {0x5e080258, 0x1801f40U},
+    {0x5e08025c, 0x20310200U},
+    {0x5e080300, 0x4090404U},
+    {0x5e080304, 0x1c0702U},
+    {0x5e080308, 0x6000303U},
+    {0x5e08030c, 0xa000aU},
+    {0x5e080310, 0x10510000U},
+    {0x5e080314, 0x9090307U}
+};
+
+/* dram_timing.ddrphy_cfg (ddr_ddrphy_cfg) */
+static const struct ddrphy_cfg_param ddr_ddrphy_cfg_diff_1gb[] = {
+    {0x300ae, 0x280},
+    {0x300ad, 0x280},
+    {0x300ac, 0x280},
+    {0x310ae, 0x280},
+    {0x310ad, 0x280},
+    {0x310ac, 0x280},
+    {0x100a3, 0x811},
+    {0x110a3, 0x81d},
+    {0x120a3, 0x811},
+    {0x130a3, 0x81d}
+};
+
+/* dram_timing.ddrphy_pie (ddr_phy_pie) */
+static const struct ddrphy_cfg_param ddr_phy_pie_diff_1gb[] = {
+    {0x4100c, 0xc008},
+    {0x41013, 0x1b00},
+    {0x4101c, 0xcb08},
+    {0x41023, 0x1b00},
+    {0x4102c, 0xe808},
+    {0x41033, 0x1b00},
+    {0x4103c, 0xea88},
+    {0x41043, 0x1b00},
+    {0x4104c, 0xeb48},
+    {0x41053, 0x1b00},
+    {0x41063, 0x1b00},
+    {0x41073, 0x1b00},
+    {0x4108b, 0x1b00},
+    {0x4109b, 0x1b00},
+    {0x410ab, 0x1b00},
+    {0x9090d, 0x0},
+    {0x2007e, 0x11},
+    {0x41a2b, 0x4b00},
+    {0x41a57, 0x400},
+    {0x41a7b, 0x4b00},
+    {0x41aa7, 0x400},
+    {0x41b33, 0x4b00},
+    {0x41b5f, 0x400},
+    {0x41bfb, 0x4b00},
+    {0x41c27, 0x400}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_cfg (ddr_phy_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_fsp0_cfg_diff_1gb[] = {
+    {0x2004a, 0x502},
+    {0x2004b, 0x123e},
+    {0x2004c, 0x4a8b},
+    {0x90801, 0x26},
+    {0x1005f, 0x0},
+    {0x10061, 0x0},
+    {0x10063, 0x0},
+    {0x10065, 0x0},
+    {0x1105f, 0x0},
+    {0x11061, 0x0},
+    {0x11063, 0x0},
+    {0x11065, 0x0},
+    {0x1205f, 0x0},
+    {0x12061, 0x0},
+    {0x12063, 0x0},
+    {0x12065, 0x0},
+    {0x1305f, 0x0},
+    {0x13061, 0x0},
+    {0x13063, 0x0},
+    {0x13065, 0x0},
+    {0x20004, 0x190},
+    {0x10006, 0x0},
+    {0x11006, 0x0},
+    {0x12006, 0x0},
+    {0x13006, 0x0},
+    {0x1000f, 0x886},
+    {0x1100f, 0x886},
+    {0x1200f, 0x886},
+    {0x1300f, 0x886},
+    {0x20035, 0x804},
+    {0x20036, 0x804},
+    {0x20037, 0x40c},
+    {0x20038, 0x1110},
+    {0x20039, 0x80c},
+    {0x2003a, 0x80c},
+    {0x2003b, 0x414},
+    {0x2003c, 0x1d18},
+    {0x2003d, 0x800},
+    {0x2003e, 0x800},
+    {0x2003f, 0x408},
+    {0x20040, 0x110c},
+    {0x2002c, 0x823},
+    {0x2002d, 0x823},
+    {0x20030, 0x823},
+    {0x2002e, 0x80f},
+    {0x2002f, 0x80f}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_msgh_cfg (ddr_phy_msgh_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg_diff_1gb[] = {
+    {0x58000, 0x0},
+    {0x58003, 0xc80},
+    {0x58012, 0x110},
+    {0x58020, 0x1},
+    {0x5802d, 0x5050},
+    {0x5802e, 0x5050},
+    {0x5802f, 0x5555},
+    {0x58030, 0x5555},
+    {0x58031, 0xd6d6},
+    {0x58032, 0xd6d6},
+    {0x58043, 0x1616},
+    {0x58044, 0x1616},
+    {0x58045, 0x0},
+    {0x58046, 0x0},
+    {0x58081, 0x2300},
+    {0x58082, 0x23}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_pie_cfg (ddr_phy_pie_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg_diff_1gb[] = {
+    {0x908f0, 0x33},
+    {0x908f1, 0x12c},
+    {0x908f4, 0xa},
+    {0x4100c, 0xc008},
+    {0x41013, 0x1b00},
+    {0x4101c, 0xcb08},
+    {0x41023, 0x1b00},
+    {0x4102c, 0xe808},
+    {0x41033, 0x1b00},
+    {0x4103c, 0xea88},
+    {0x41043, 0x1b00},
+    {0x4104c, 0xeb48},
+    {0x41053, 0x1b00},
+    {0x41063, 0x1b00},
+    {0x41073, 0x1b00},
+    {0x4108b, 0x1b00},
+    {0x4109b, 0x1b00},
+    {0x410ab, 0x1b00},
+    {0x2004a, 0x123e},
+    {0x2004b, 0x123e},
+    {0x2004c, 0x480b},
+    {0x90802, 0x1},
+    {0x20045, 0x1},
+    {0x1000f, 0x887},
+    {0x1100f, 0x887},
+    {0x1200f, 0x887},
+    {0x1300f, 0x887},
+    {0x90811, 0xff01},
+    {0x90812, 0xff01},
+    {0x20072, 0x1},
+    {0x9080e, 0x1},
+    {0x20073, 0x1},
+    {0x9080f, 0x1}
+};
+
+/*
+ * 2GB variant register differences.
+ */
+
+/* dram_timing.ddrc_cfg (ddr_ddrc_cfg) */
+static const struct ddrc_cfg_param ddr_ddrc_cfg_diff_2gb[] = {
+    {0x5e080110, 0x41110001U},
+    {0x5e080000, 0x7fU},
+    {0x5e080010, 0x0U},
+    {0x5e080024, 0x8000fffU},
+    {0x5e080080, 0x80800322U},
+    {0x5e080084, 0x0U}
+};
+
+/* dram_timing.fsp_cfg[0].ddrc_cfg (ddr_dram_fsp0_ddrc_cfg) */
+static const struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg_diff_2gb[] = {
+    {0x5e080100, 0x20a2100U},
+    {0x5e080104, 0x66000cU},
+    {0x5e080108, 0xf2f20c45U},
+    {0x5e080160, 0x0U},
+    {0x5e080254, 0x580040U},
+    {0x5e080304, 0x4c0e02U},
+    {0x5e08030c, 0x28001cU}
+};
+
+/* dram_timing.ddrphy_cfg (ddr_ddrphy_cfg) */
+static const struct ddrphy_cfg_param ddr_ddrphy_cfg_diff_2gb[] = {
+    {0x300ae, 0x280},
+    {0x300ad, 0x280},
+    {0x300ac, 0x280},
+    {0x310ae, 0x280},
+    {0x310ad, 0x280},
+    {0x310ac, 0x280},
+    {0x100a3, 0x811},
+    {0x110a3, 0x81d},
+    {0x120a3, 0x811},
+    {0x130a3, 0x81d}
+};
+
+/* dram_timing.ddrphy_pie (ddr_phy_pie) */
+static const struct ddrphy_cfg_param ddr_phy_pie_diff_2gb[] = {
+    {0x4101c, 0xcf08},
+    {0x9090d, 0x0},
+    {0x2007e, 0x11}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_cfg (ddr_phy_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_fsp0_cfg_diff_2gb[] = {
+    {0x1005f, 0x0},
+    {0x10061, 0x0},
+    {0x10063, 0x0},
+    {0x10065, 0x0},
+    {0x1105f, 0x0},
+    {0x11061, 0x0},
+    {0x11063, 0x0},
+    {0x11065, 0x0},
+    {0x1205f, 0x0},
+    {0x12061, 0x0},
+    {0x12063, 0x0},
+    {0x12065, 0x0},
+    {0x1305f, 0x0},
+    {0x13061, 0x0},
+    {0x13063, 0x0},
+    {0x13065, 0x0}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_msgh_cfg (ddr_phy_msgh_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg_diff_2gb[] = {
+    {0x58000, 0x0},
+    {0x58012, 0x110},
+    {0x58020, 0x1},
+    {0x58043, 0x1e1e},
+    {0x58044, 0x1e1e}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_pie_cfg (ddr_phy_pie_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg_diff_2gb[] = {
+    {0x4101c, 0xcf08},
+    {0x90802, 0x1},
+    {0x20072, 0x1},
+    {0x9080e, 0x1},
+    {0x20073, 0x1},
+    {0x9080f, 0x1}
+};
+
+/*
+ * 16GB variant register differences.
+ */
+
+/* dram_timing.ddrc_cfg (ddr_ddrc_cfg) */
+static const struct ddrc_cfg_param ddr_ddrc_cfg_diff_16gb[] = {
+    {0x5e080000, 0x3ffU},
+    {0x5e080010, 0x4U},
+    {0x5e080080, 0x80800522U},
+    {0x5e080084, 0x80800522U},
+    {0x5e080114, 0x201000U}
+};
+
+/* dram_timing.fsp_cfg[0].ddrc_cfg (ddr_dram_fsp0_ddrc_cfg) */
+static const struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg_diff_16gb[] = {
+    {0x5e080108, 0xf2f68d47U},
+    {0x5e080170, 0x8c010509U},
+    {0x5e080250, 0x110c11U},
+    {0x5e080304, 0x680f02U}
+};
+
+/* dram_timing.ddrphy_cfg (ddr_ddrphy_cfg) */
+static const struct ddrphy_cfg_param ddr_ddrphy_cfg_diff_16gb[] = {
+    {0x110a3, 0x833},
+    {0x130a3, 0x833}
+};
+
+/* dram_timing.ddrphy_pie (ddr_phy_pie) */
+static const struct ddrphy_cfg_param ddr_phy_pie_diff_16gb[] = {
+    {0x4107c, 0x4248},
+    {0x41084, 0x9648},
+    {0x41a53, 0x4b00},
+    {0x41aa3, 0x4b00},
+    {0x41b5b, 0x4b00},
+    {0x41c23, 0x4b00}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_cfg (ddr_phy_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_fsp0_cfg_diff_16gb[] = {
+    {0x20039, 0x1024},
+    {0x2003a, 0x1024},
+    {0x2003b, 0x434},
+    {0x2003c, 0x2d38},
+    {0x2002c, 0x84b},
+    {0x2002d, 0x84b},
+    {0x20030, 0x84b}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_msgh_cfg (ddr_phy_msgh_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg_diff_16gb[] = {
+    {0x58041, 0xac84},
+    {0x58042, 0xac84},
+    {0x58081, 0x4b00},
+    {0x58082, 0x4b}
+};
+
+/* dram_timing.fsp_msg->fsp_phy_pie_cfg (ddr_phy_pie_fsp0_cfg) */
+static const struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg_diff_16gb[] = {
+    {0x4107c, 0x4248},
+    {0x41084, 0x9648}
+};
+
+/*
+ * 16GB variant: register not present in the 8GB table. It is inserted in
+ * sorted position by ddr_timing_insert().
+ */
+static const struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg_insert_16gb[] = {
+    {0x5800e, 0xf}
+};
+
+
+void set_dram_timings_1gb(void)
+{
+    create_dram_timing_scratches();
+    /* apply 1GB diff tables to the runtime modifiable copies of 8gb timing tables */
+
+    /* DDRC main config (ddr_ddrc_cfg) */
+    ddr_timing_patch_ddrc(ddr_ddrc_cfg_diff_1gb, ARRAY_SIZE(ddr_ddrc_cfg_diff_1gb),
+        dram_timing.ddrc_cfg, dram_timing.ddrc_cfg_num);
+
+    /* DDRC FSP0 config (ddr_dram_fsp0_ddrc_cfg) */
+    ddr_timing_patch_ddrc(ddr_dram_fsp0_ddrc_cfg_diff_1gb,
+        ARRAY_SIZE(ddr_dram_fsp0_ddrc_cfg_diff_1gb),
+        dram_timing.fsp_cfg[0].ddrc_cfg, dram_timing.fsp_cfg[0].ddrc_cfg_num);
+
+    /* PHY initialize config (ddr_ddrphy_cfg) */
+    ddr_timing_patch(ddr_ddrphy_cfg_diff_1gb,
+        ARRAY_SIZE(ddr_ddrphy_cfg_diff_1gb),
+        dram_timing.ddrphy_cfg, dram_timing.ddrphy_cfg_num);
+
+    /* PHY common PIE (ddr_phy_pie) */
+    ddr_timing_patch(ddr_phy_pie_diff_1gb, ARRAY_SIZE(ddr_phy_pie_diff_1gb),
+        dram_timing.ddrphy_pie, dram_timing.ddrphy_pie_num);
+
+    /* PHY FSP0 config (ddr_phy_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_fsp0_cfg_diff_1gb,
+        ARRAY_SIZE(ddr_phy_fsp0_cfg_diff_1gb),
+        dram_timing.fsp_msg->fsp_phy_cfg,
+        dram_timing.fsp_msg->fsp_phy_cfg_num);
+
+    /* PHY message block (ddr_phy_msgh_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_msgh_fsp0_cfg_diff_1gb,
+        ARRAY_SIZE(ddr_phy_msgh_fsp0_cfg_diff_1gb),
+        dram_timing.fsp_msg->fsp_phy_msgh_cfg,
+        dram_timing.fsp_msg->fsp_phy_msgh_cfg_num);
+
+    /* PHY FSP0 PIE (ddr_phy_pie_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_pie_fsp0_cfg_diff_1gb,
+        ARRAY_SIZE(ddr_phy_pie_fsp0_cfg_diff_1gb),
+        dram_timing.fsp_msg->fsp_phy_pie_cfg,
+        dram_timing.fsp_msg->fsp_phy_pie_cfg_num);
+
+    /* 1GB runs at 3200 MT/s; keep the drate table in sync */
+    dram_timing.fsp_msg->drate = 3200;
+    dram_timing.fsp_table[0] = 3200;
+}
+
+void set_dram_timings_2gb(void)
+{
+    create_dram_timing_scratches();
+    /* apply 2GB diff tables to the runtime modifiable copies of 8gb timing tables */
+
+    /* DDRC main config (ddr_ddrc_cfg) */
+    ddr_timing_patch_ddrc(ddr_ddrc_cfg_diff_2gb, ARRAY_SIZE(ddr_ddrc_cfg_diff_2gb),
+        dram_timing.ddrc_cfg, dram_timing.ddrc_cfg_num);
+
+    /* DDRC FSP0 config (ddr_dram_fsp0_ddrc_cfg) */
+    ddr_timing_patch_ddrc(ddr_dram_fsp0_ddrc_cfg_diff_2gb,
+        ARRAY_SIZE(ddr_dram_fsp0_ddrc_cfg_diff_2gb),
+        dram_timing.fsp_cfg[0].ddrc_cfg, dram_timing.fsp_cfg[0].ddrc_cfg_num);
+
+    /* PHY initialize config (ddr_ddrphy_cfg) */
+    ddr_timing_patch(ddr_ddrphy_cfg_diff_2gb,
+        ARRAY_SIZE(ddr_ddrphy_cfg_diff_2gb),
+        dram_timing.ddrphy_cfg, dram_timing.ddrphy_cfg_num);
+
+    /* PHY common PIE (ddr_phy_pie) */
+    ddr_timing_patch(ddr_phy_pie_diff_2gb, ARRAY_SIZE(ddr_phy_pie_diff_2gb),
+        dram_timing.ddrphy_pie, dram_timing.ddrphy_pie_num);
+
+    /* PHY FSP0 config (ddr_phy_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_fsp0_cfg_diff_2gb,
+        ARRAY_SIZE(ddr_phy_fsp0_cfg_diff_2gb),
+        dram_timing.fsp_msg->fsp_phy_cfg,
+        dram_timing.fsp_msg->fsp_phy_cfg_num);
+
+    /* PHY message block (ddr_phy_msgh_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_msgh_fsp0_cfg_diff_2gb,
+        ARRAY_SIZE(ddr_phy_msgh_fsp0_cfg_diff_2gb),
+        dram_timing.fsp_msg->fsp_phy_msgh_cfg,
+        dram_timing.fsp_msg->fsp_phy_msgh_cfg_num);
+
+    /* PHY FSP0 PIE (ddr_phy_pie_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_pie_fsp0_cfg_diff_2gb,
+        ARRAY_SIZE(ddr_phy_pie_fsp0_cfg_diff_2gb),
+        dram_timing.fsp_msg->fsp_phy_pie_cfg,
+        dram_timing.fsp_msg->fsp_phy_pie_cfg_num);
+}
+
+void set_dram_timings_16gb(void)
+{
+    create_dram_timing_scratches();
+    /* apply 16GB diff tables to the runtime modifiable copies of 8gb timing tables */
+
+    /* DDRC main config (ddr_ddrc_cfg) */
+    ddr_timing_patch_ddrc(ddr_ddrc_cfg_diff_16gb, ARRAY_SIZE(ddr_ddrc_cfg_diff_16gb),
+        dram_timing.ddrc_cfg, dram_timing.ddrc_cfg_num);
+
+    /* DDRC FSP0 config (ddr_dram_fsp0_ddrc_cfg) */
+    ddr_timing_patch_ddrc(ddr_dram_fsp0_ddrc_cfg_diff_16gb,
+        ARRAY_SIZE(ddr_dram_fsp0_ddrc_cfg_diff_16gb),
+        dram_timing.fsp_cfg[0].ddrc_cfg, dram_timing.fsp_cfg[0].ddrc_cfg_num);
+
+    /* PHY initialize config (ddr_ddrphy_cfg) */
+    ddr_timing_patch(ddr_ddrphy_cfg_diff_16gb,
+        ARRAY_SIZE(ddr_ddrphy_cfg_diff_16gb),
+        dram_timing.ddrphy_cfg, dram_timing.ddrphy_cfg_num);
+
+    /* PHY common PIE (ddr_phy_pie) */
+    ddr_timing_patch(ddr_phy_pie_diff_16gb, ARRAY_SIZE(ddr_phy_pie_diff_16gb),
+        dram_timing.ddrphy_pie, dram_timing.ddrphy_pie_num);
+
+    /* PHY FSP0 config (ddr_phy_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_fsp0_cfg_diff_16gb,
+        ARRAY_SIZE(ddr_phy_fsp0_cfg_diff_16gb),
+        dram_timing.fsp_msg->fsp_phy_cfg,
+        dram_timing.fsp_msg->fsp_phy_cfg_num);
+
+    /* PHY message block (ddr_phy_msgh_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_msgh_fsp0_cfg_diff_16gb,
+        ARRAY_SIZE(ddr_phy_msgh_fsp0_cfg_diff_16gb),
+        dram_timing.fsp_msg->fsp_phy_msgh_cfg,
+        dram_timing.fsp_msg->fsp_phy_msgh_cfg_num);
+    /* register not in the 8GB table: insert in sorted position */
+    ddr_timing_insert(dram_timing.fsp_msg->fsp_phy_msgh_cfg,
+        &dram_timing.fsp_msg->fsp_phy_msgh_cfg_num, DDR_TIMING_MSGH_CAP,
+        &ddr_phy_msgh_fsp0_cfg_insert_16gb[0]);
+
+    /* PHY FSP0 PIE (ddr_phy_pie_fsp0_cfg) */
+    ddr_timing_patch(ddr_phy_pie_fsp0_cfg_diff_16gb,
+        ARRAY_SIZE(ddr_phy_pie_fsp0_cfg_diff_16gb),
+        dram_timing.fsp_msg->fsp_phy_pie_cfg,
+        dram_timing.fsp_msg->fsp_phy_pie_cfg_num);
+}

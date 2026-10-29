@@ -13,10 +13,10 @@
 void phytec_imx95_set_dram_timings(enum phytec_imx95_ddr_eeprom_code opt) {
     switch (opt) {
         case PHYTEC_IMX95_DDR_1GB:
-            printf("1GB RAM version not supported yet\n");
+            set_dram_timings_1gb();
             break;
         case PHYTEC_IMX95_DDR_2GB:
-            printf("2GB RAM version not supported yet\n");
+            set_dram_timings_2gb();
             break;
         case PHYTEC_IMX95_DDR_4GB:
             set_dram_timings_4gb();
@@ -25,7 +25,7 @@ void phytec_imx95_set_dram_timings(enum phytec_imx95_ddr_eeprom_code opt) {
             /* default; do nothing */
             break;
         case PHYTEC_IMX95_DDR_16GB:
-            printf("16GB RAM version not supported yet\n");
+            set_dram_timings_16gb();
             break;
         default:
             printf("Invalid DRAM EEPROM Option %u\n", opt);

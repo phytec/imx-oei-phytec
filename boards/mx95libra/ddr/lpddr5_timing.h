@@ -13,6 +13,9 @@
  */
 void ddr_timing_init(void);
 
+void set_dram_timings_1gb(void);
+void set_dram_timings_2gb(void);
 void set_dram_timings_4gb(void);
+void set_dram_timings_16gb(void);
 
 #endif /* __LPDDR5_TIMING_H__ */
