@@ -10795,6 +10795,33 @@ static void name(const struct type_ *diff, unsigned int dnum,           \
 DDR_TIMING_PATCH_FUN(ddr_timing_patch_ddrc, ddrc_cfg_param)
 DDR_TIMING_PATCH_FUN(ddr_timing_patch, ddrphy_cfg_param)
 
+/*
+ * Insert one entry into a table that is sorted by register address. The
+ * table must have room for one more entry (cap is its capacity). The entries
+ * behind the insert position are shifted up by one.
+ */
+static void ddr_timing_insert(struct ddrphy_cfg_param *tbl, unsigned int *num,
+    unsigned int cap, const struct ddrphy_cfg_param *entry)
+{
+    unsigned int pos, i;
+
+    if (*num >= cap) {
+        printf("WARNING: ddr timing table full, register 0x%x not inserted\n",
+            entry->reg);
+        return;
+    }
+
+    for (pos = 0; pos < *num && tbl[pos].reg < entry->reg; pos++) {
+    }
+
+    for (i = *num; i > pos; i--) {
+        ddr_timing_copy(&tbl[i], &tbl[i - 1], sizeof(struct ddrphy_cfg_param));
+    }
+    tbl[pos].reg = entry->reg;
+    tbl[pos].val = entry->val;
+    (*num)++;
+}
+
 void create_dram_timing_scratches(void)
 {
     volatile uint32_t *w;
