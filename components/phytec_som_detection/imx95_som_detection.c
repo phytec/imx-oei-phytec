@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "imx95_som_detection.h"
+#include "lpddr5_timing.h"
 
 #ifdef PHYTEC_IMX95_SOM_DETECTION
 
@@ -18,7 +19,7 @@ void phytec_imx95_set_dram_timings(enum phytec_imx95_ddr_eeprom_code opt) {
             printf("2GB RAM version not supported yet\n");
             break;
         case PHYTEC_IMX95_DDR_4GB:
-            printf("4GB RAM version not supported yet\n");
+            set_dram_timings_4gb();
             break;
         case PHYTEC_IMX95_DDR_8GB:
             /* default; do nothing */
