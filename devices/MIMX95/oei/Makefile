@@ -82,11 +82,11 @@ OBJS  += \
     $(OUT)/fsl_mu.o \
     $(OUT)/fsl_ele.o \
     $(OUT)/crc.o \
-    $(OUT)/crc8.o \
-    $(OUT)/imx95_som_detection.o
+    $(OUT)/crc8.o
 
 ifeq ($(PHYTEC_SOM_DETECTION), 1)
 FLAGS += -DPHYTEC_IMX95_SOM_DETECTION
+OBJS  += $(OUT)/imx95_som_detection.o
 endif
 endif
 

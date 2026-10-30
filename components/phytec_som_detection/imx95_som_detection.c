@@ -88,12 +88,4 @@ uint8_t __maybe_unused phytec_get_imx95_ddr_size(struct phytec_eeprom_data *data
 #endif /* DEBUG */
     return ddr_id;
 }
-
-#else
-
-inline uint8_t __maybe_unused phytec_imx95_detect(struct phytec_eeprom_data *data)
-{
-    return 1;
-}
-
 #endif /* PHYTEC_IMX95_SOM_DETECTION */
