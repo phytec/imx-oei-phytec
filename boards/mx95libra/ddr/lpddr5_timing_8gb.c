@@ -7,12 +7,14 @@
  * DDR PHY FW2024.09-SP2
  * Chip revision: B0
  * Part number: MT62F2G32D4DS-023 IT:C (IM1041)
+ *
+ * Default 8GB LPDDR5 timing tables.
  */
 
 #include "ddr.h"
+#include "lpddr5_timing_8gb.h"
 
-/* Initialize DDRC registers */
-static struct ddrc_cfg_param ddr_ddrc_cfg[] = {
+struct ddrc_cfg_param ddr_ddrc_cfg[] = {
     {0x5e080110, 0x41114001U},
     {0x5e080000, 0x1ffU},
     {0x5e080008, 0x0U},
@@ -53,7 +55,7 @@ static struct ddrc_cfg_param ddr_ddrc_cfg[] = {
 };
 
 /* DRAM fsp configurations */
-static struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg[] = {
+struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg[] = {
     {0x5e080100, 0x020D2100U},
     {0x5e080104, 0x4866000CU},
     {0x5e080108, 0xF2F28C45U},
@@ -75,7 +77,7 @@ static struct ddrc_cfg_param ddr_dram_fsp0_ddrc_cfg[] = {
 };
 
 /* PHY Initialize Configuration */
-static struct ddrphy_cfg_param ddr_ddrphy_cfg[] = {
+struct ddrphy_cfg_param ddr_ddrphy_cfg[] = {
     {0x10080, 0x0},
     {0x10081, 0x1},
     {0x10082, 0x2},
@@ -166,7 +168,7 @@ static struct ddrphy_cfg_param ddr_ddrphy_cfg[] = {
 };
 
 /* PHY trained csr */
-static struct ddrphy_cfg_param ddr_ddrphy_trained_csr[] = {
+struct ddrphy_cfg_param ddr_ddrphy_trained_csr[] = {
     {0x200a5, 0x0},
     {0xd0036, 0x0},
     {0x200bd, 0x0},
@@ -5869,7 +5871,7 @@ static struct ddrphy_cfg_param ddr_ddrphy_trained_csr[] = {
 };
 
 /* PHY Initialize Configuration for Pstate 0 */
-static struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
+struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
     {0x90802, 0x1},
     {0x2004a, 0x601},
     {0x2004b, 0x1c3e},
@@ -6300,7 +6302,7 @@ static struct ddrphy_cfg_param ddr_phy_fsp0_cfg[] = {
 };
 
 /* P0 message block parameter for training firmware */
-static struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg[] = {
+struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg[] = {
     {0x58000, 0x4000},
     {0x58002, 0x30},
     {0x58003, 0x1900},
@@ -6347,7 +6349,7 @@ static struct ddrphy_cfg_param ddr_phy_msgh_fsp0_cfg[] = {
 };
 
 /* DRAM PHY init engine image for Pstate 0 */
-static struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg[] = {
+struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg[] = {
     {0x908f0, 0x65},
     {0x908f1, 0x258},
     {0x908f2, 0x0},
@@ -6570,7 +6572,7 @@ static struct ddrphy_cfg_param ddr_phy_pie_fsp0_cfg[] = {
 };
 
 /* DRAM PHY init engine image */
-static struct ddrphy_cfg_param ddr_phy_pie[] = {
+struct ddrphy_cfg_param ddr_phy_pie[] = {
     {0x41000, 0x0},
     {0x41001, 0x0},
     {0x41002, 0x0},
@@ -10615,7 +10617,7 @@ static struct ddrphy_cfg_param ddr_phy_pie[] = {
     {0xd0003, 0x0},
 };
 
-static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
+struct dram_fsp_msg ddr_dram_fsp_msg[] = {
     {
         /* P0 6400mts */
         .drate = 6400,
@@ -10631,7 +10633,7 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 };
 
 /* dram fsp cfg */
-static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
+struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
     {
         .ddrc_cfg = ddr_dram_fsp0_ddrc_cfg,
         .ddrc_cfg_num = ARRAY_SIZE(ddr_dram_fsp0_ddrc_cfg),
@@ -10640,7 +10642,7 @@ static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 };
 
 /* ddr timing config params */
-struct dram_timing_info dram_timing = {
+const struct dram_timing_info dram_timing = {
     .ddrc_cfg = ddr_ddrc_cfg,
     .ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
     .ddrphy_cfg = ddr_ddrphy_cfg,

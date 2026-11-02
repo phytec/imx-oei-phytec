@@ -1,4 +1,3 @@
-DDR_CONFIG ?= lpddr5_timing
-OBJS  += $(OUT)/$(DDR_CONFIG).o
+OBJS  += $(OUT)/lpddr5_timing_8gb.o
 
 VPATH += boards/mx95libra/ddr
