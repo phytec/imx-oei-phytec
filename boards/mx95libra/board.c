@@ -13,6 +13,9 @@
 #include "fsl_lpuart.h"
 #include "fsl_ccm.h"
 #include "fsl_clock.h"
+#ifdef DDR_TIMING_INIT
+#include "lpddr5_timing.h"
+#endif
 #ifdef PHYTEC_SOM_DETECTION
 #include "imx95_som_detection.h"
 #endif
@@ -118,7 +121,9 @@ void BOARD_InitHardware(void)
     if (err != kStatus_Success) {
         printf("EEPROM Init failed\n");
     }
-
+#ifdef DDR_TIMING_INIT
+    ddr_timing_init();
+#endif
 #ifdef PHYTEC_SOM_DETECTION
     struct phytec_eeprom_data data = {};
 	int ret = phytec_eeprom_data_setup(&data, 0, 0x51);
@@ -127,6 +132,7 @@ void BOARD_InitHardware(void)
 		if (!ret)
 			phytec_print_som_info(&data);
 	}
+    phytec_imx95_set_dram_timings(phytec_get_imx95_ddr_size(&data));
 #endif
 
 }

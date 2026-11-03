@@ -13,14 +13,11 @@ ifeq ($(IEE),1)
     OBJS  += $(OUT)/iee.o
 endif
 
-INCLUDE += -I$(COMPONENTS_DIR)/phytec_som_detection
-
 OBJS += \
 	$(OUT)/main.o \
 	$(OUT)/ddr_init.o \
 	$(OUT)/ddrphy_utils.o \
-	$(OUT)/helper.o \
-	$(OUT)/phytec_som_detection.o
+	$(OUT)/helper.o
 
 OBJS  += \
 	$(OUT)/ddrphy_qb.o \
@@ -28,8 +25,12 @@ OBJS  += \
 	$(OUT)/ddrphy_qb_gen.o \
 	$(OUT)/romapi.o
 
+FLAGS += -DDDR_TIMING_INIT
+
 ifeq ($(PHYTEC_SOM_DETECTION), 1)
 FLAGS += -DPHYTEC_SOM_DETECTION
+INCLUDE += -I$(COMPONENTS_DIR)/phytec_som_detection
+OBJS  += $(OUT)/phytec_som_detection.o
 endif
 
 VPATH += \
