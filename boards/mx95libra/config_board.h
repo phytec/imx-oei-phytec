@@ -61,6 +61,12 @@
 /*! Config for EEPROM I2C baudrate */
 #define BOARD_I2C_BAUDRATE           400000U
 
+/*! Define board specific DDR IEE region */
+#if defined(DDR_IEE)
+#define DDR_IEE_REG_START            0x80000000ULL
+#define DDR_IEE_REG_END              0x89FFFFFFULL
+#endif
+
 #endif /* CONFIG_BOARD_H */
 
 /** @} */
